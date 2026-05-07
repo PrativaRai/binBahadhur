@@ -5,9 +5,11 @@ import 'package:binbahadhur/features/auth/presentation/providers/user_provider.d
 import 'package:binbahadhur/features/employee/presentation/pages/employee.dart';
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
+import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_area_page.dart';
 import 'package:binbahadhur/router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:binbahadhur/features/schedule_pickup/presentation/pages/area_page.dart';
 
 void main() {
   runApp(
@@ -45,6 +47,10 @@ class _MyAppState extends State<MyApp> {
       onGenerateRoute: (settings) => AppRouter.generateRoute(settings),
       // home: AdminPage(),
       home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
+
+        //  home: const AreaPage(),
+      //  home: const RRAreaPage()
+
     );
   }
 

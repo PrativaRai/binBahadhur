@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/core/widgets/custom_option.dart';
 import 'package:binbahadhur/features/report_and_reward/presentation/pages/report_page.dart';
-import 'package:binbahadhur/features/schedule_pickup/presentation/pages/schedule_page.dart';
+import 'package:binbahadhur/features/schedule_pickup/presentation/pages/area_page.dart';
+import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_area_page.dart';
 
 class HomePage extends StatelessWidget {
   static const String routeName = '/home';
@@ -107,7 +108,8 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const SchedulePage(),
+                              //maile schedulepage vanda agadi area schedule ma lagnu ko lagi AreaPage() ma link gareko instead of SchedulePage()
+                              builder: (context) => const AreaPage(),
                             ),
                           );
                         },
@@ -120,7 +122,7 @@ class HomePage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const ReportPage(),
+                              builder: (context) => const RRAreaPage(),
                             ),
                           );
                         },
