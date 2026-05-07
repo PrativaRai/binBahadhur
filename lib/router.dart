@@ -3,7 +3,6 @@ import 'package:binbahadhur/features/admin/presentation/pages/manage_employee.da
 import 'package:binbahadhur/features/admin/presentation/pages/reports_pages.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/employee.dart';
-import 'package:binbahadhur/features/report_and_reward/presentation/pages/report_page.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
 import 'package:binbahadhur/features/auth/presentation/pages/welcome_page.dart';
@@ -24,6 +23,49 @@ class AppRouter {
           builder: (_) => const HomePage(),
         );
 
+      //admin
+      case AdminPage.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const AdminPage(),
+        );
+
+      //employee
+      case EmployeePage.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const EmployeePage(),
+        );
+
+      //welcome
+      case WelcomePage.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const WelcomePage(),
+        );
+
+      //complain
+      case Complain.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const Complain(),
+        );
+
+      //report
+
+      case ReportsPage.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const ReportsPage(),
+        );
+
+      //manageemployee admin  ko
+
+      case ManageEmployee.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const ManageEmployee(),
+        );
       default:
         return MaterialPageRoute(
           settings: routeSettings,

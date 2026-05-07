@@ -1,10 +1,10 @@
 const express = require('express');
 const adminRouter = express.Router();
 const Complain = require("../models/complain");
-const User = require("../models/user"); // FIX 1: Import the User model
+const User = require("../models/user"); 
 const adminMiddleware = require("../middleware/admin");
 
-// get complain
+// 1. GET ALL COMPLAINTS
 adminRouter.get('/admin/get-complain', adminMiddleware, async (req, res) => {
     try {
         const complain = await Complain.find({});
@@ -14,7 +14,7 @@ adminRouter.get('/admin/get-complain', adminMiddleware, async (req, res) => {
     }
 });
 
-// resolve
+// 2. RESOLVE / DELETE COMPLAINT
 adminRouter.post('/admin/delete-complain', adminMiddleware, async (req, res) => {
     try {
         const { id } = req.body;
@@ -25,20 +25,22 @@ adminRouter.post('/admin/delete-complain', adminMiddleware, async (req, res) => 
     }
 });
 
-// suspend
+// 3. UPDATE USER STATUS (SUSPEND/ACTIVATE)
 adminRouter.post("/admin/update-user-status", adminMiddleware, async (req, res) => {
     try {
-        const { email, targetStatus } = req.body;
+        // CHANGED: Receiving phoneNumber instead of email from the request body
+        const { phoneNumber, targetStatus } = req.body;
 
-        // Find the user by email and update their 'status' field
+        // CHANGED: Finding user by phoneNumber
         const user = await User.findOneAndUpdate(
-            { email: email },
+            { phoneNumber: phoneNumber }, 
             { status: targetStatus },
-            { new: true } // Returns the updated document
+            { new: true } 
         );
 
         if (!user) {
-            return res.status(400).json({ msg: "User with this email not found!" });
+            // CHANGED: Updated error message for clarity
+            return res.status(400).json({ msg: "User with this phone number not found!" });
         }
 
         res.json(user);

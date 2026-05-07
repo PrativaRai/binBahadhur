@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 
 class WelcomePage extends StatefulWidget {
+  static const String routeName = '/Welcomepage';
   const WelcomePage({super.key});
 
   @override

@@ -6,7 +6,7 @@ import 'package:binbahadhur/features/employee/presentation/widgets/custom_textfi
 import 'package:flutter/material.dart';
 
 class ManageEmployee extends StatefulWidget {
-  static const String routeName = '/manage-employee';
+  static const String routeName = '/ManageEmployee';
   const ManageEmployee({super.key});
 
   @override
@@ -14,7 +14,8 @@ class ManageEmployee extends StatefulWidget {
 }
 
 class _ManageEmployeeState extends State<ManageEmployee> {
-  final TextEditingController emailController = TextEditingController();
+  // CHANGED: Renamed controller from email to phone
+  final TextEditingController phoneController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController employeeController = TextEditingController();
   final AdminServices adminServices = AdminServices();
@@ -24,15 +25,16 @@ class _ManageEmployeeState extends State<ManageEmployee> {
 
   @override
   void dispose() {
-    emailController.dispose();
+    phoneController.dispose();
     descriptionController.dispose();
     employeeController.dispose();
     super.dispose();
   }
 
   void handleAccountStatus() {
-    if (emailController.text.isEmpty) {
-      showSnackBar(context, "Please enter an email address.");
+    // CHANGED: Validation check for phone number
+    if (phoneController.text.isEmpty) {
+      showSnackBar(context, "Please enter a phone number.");
       return;
     }
 
@@ -41,7 +43,8 @@ class _ManageEmployeeState extends State<ManageEmployee> {
 
     adminServices.updateUserStatus(
       context: context,
-      email: emailController.text,
+      // CHANGED: Passing phoneNumber instead of email
+      phoneNumber: phoneController.text,
       status: status,
       onSuccess: () {
         showSnackBar(
@@ -50,7 +53,7 @@ class _ManageEmployeeState extends State<ManageEmployee> {
               ? "Account Suspended!"
               : "Suspension Lifted Successfully!",
         );
-        emailController.clear();
+        phoneController.clear();
         descriptionController.clear();
         employeeController.clear();
       },
@@ -79,8 +82,10 @@ class _ManageEmployeeState extends State<ManageEmployee> {
               const SizedBox(height: 20),
 
               CustomTextField(
-                controller: emailController,
-                hintText: "Enter Email",
+                controller: phoneController,
+                // CHANGED: Hint text and keyboard type
+                hintText: "Enter Phone Number",
+                keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 15),
 

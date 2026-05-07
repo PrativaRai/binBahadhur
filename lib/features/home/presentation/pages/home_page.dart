@@ -1,3 +1,4 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -17,6 +18,7 @@ class HomePage extends StatelessWidget {
     final String date = DateFormat('EEEE, d MMM').format(DateTime.now());
 
     return Scaffold(
+      appBar: const CommonAppBar(title: 'User Dashboard'),
       body: Column(
         children: [
           Container(

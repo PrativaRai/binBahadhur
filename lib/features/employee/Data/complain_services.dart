@@ -10,14 +10,14 @@ import 'package:provider/provider.dart';
 class EmployeeServices {
   void complain({
     required BuildContext context,
-    required email,
-    required description,
-    required employee,
+    required String phoneNumber, // Changed from email
+    required String description,
+    required String employee,
   }) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
       ComplainModel complain = ComplainModel(
-        email: email,
+        phoneNumber: phoneNumber, // Updated to match ComplainModel
         description: description,
         employee: employee,
       );
@@ -35,7 +35,7 @@ class EmployeeServices {
         response: res,
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'complain added');
+          showSnackBar(context, 'Complain added successfully');
           Navigator.pop(context);
         },
       );

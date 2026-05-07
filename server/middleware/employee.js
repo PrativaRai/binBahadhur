@@ -19,7 +19,7 @@ const employee = async (req, res, next) => {
     }
 
     // employee matrw aily ko lage employee navako ly user lekeheko 
-    if (user.type !== 'user') {
+    if (user.type !== 'employee') {
       return res.status(403).json({ msg: "Access denied. Employees only." });
     }
 

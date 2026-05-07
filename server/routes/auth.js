@@ -1,95 +1,85 @@
 const express = require("express");
 const User = require("../models/user");
-const bcryptjs= require('bcryptjs');
+const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const auth = require("../middleware/auth");
 
 const authRouter = express.Router();
-//Sign up
-authRouter.post('/api/signup', async (req,res)=>{
-    //get data from client
-      try {
-    const { name, email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res
-        .status(400)
-        .json({ msg: "User with same email already exists!" });
+// 1. Sign up
+authRouter.post('/api/signup', async (req, res) => {
+    try {
+        const { name, phone, password } = req.body;
+        const existingUser = await User.findOne({ phone });
+        if (existingUser) {
+            return res.status(400).json({ msg: "User with this phone number already exists!" });
+        }
+        const hashedPassword = await bcryptjs.hash(password, 8);
+        let user = new User({ phone, password: hashedPassword, name });
+        user = await user.save();
+        res.json(user);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
-
-    const hashedPassword = await bcryptjs.hash(password, 8);
-
-    let user = new User({
-      email,
-      password: hashedPassword,
-      name,
-    });
-    user = await user.save();
-    res.json(user);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
 });
 
-//Sign Route 
-authRouter.post('/api/signin', async(req,res)=>{
+// 2. Sign In
+authRouter.post('/api/signin', async (req, res) => {
+    try {
+        const { phone, password } = req.body;
+        const user = await User.findOne({ phone });
+        if (!user) return res.status(400).json({ msg: "User does not exist!" });
 
-try{
-const {email, password}=req.body;
+        const isMatch = await bcryptjs.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ msg: "Incorrect password." });
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res
-        .status(400)
-        .json({ msg: "User with this email does not exist!" });
+        const token = jwt.sign({ id: user._id }, "passwordKey");
+        res.json({ token, ...user._doc });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
-if (user.status === 'suspended') {
-      return res.status(403).json({ 
-        msg: "Your account has been suspended. Please contact the administrator." 
-      });
-    }
-
-    if (user.status === 'blocked') {
-      return res.status(403).json({ 
-        msg: "This account has been permanently blocked." 
-      });
-    }
-    const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: "Incorrect password." });
-    }
-
-    const token = jwt.sign({ id: user._id }, "passwordKey");
-    res.json({ token, ...user._doc });
-}
-catch(e){
-   res.status(500).json({ error: e.message });
-}
-
-});
-// get user data
-authRouter.get("/", auth, async (req, res) => {
-  const user = await User.findById(req.user);
-  res.json({ ...user._doc, token: req.token });
 });
 
-// Check if token is valid
-authRouter.post("/tokenIsValid", async (req, res) => {
-  try {
-    const token = req.header("x-auth-token");
-    if (!token) return res.json(false);
-    
-    const verified = jwt.verify(token, "passwordKey");
-    if (!verified) return res.json(false);
+// 3. Forgot Password
+authRouter.post('/api/forgot-password', async (req, res) => {
+    try {
+        const { phone } = req.body;
+        const user = await User.findOne({ phone });
+        if (!user) return res.status(400).json({ msg: "User not found!" });
 
-    const user = await User.findById(verified.id);
-    if (!user) return res.json(false);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user.passwordResetOtp = otp;
+        user.passwordResetExpires = Date.now() + 600000; 
+        await user.save();
 
-    return res.json(true);
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+        console.log(`OTP for ${phone} is: ${otp}`); // testing
+        res.json({ msg: "OTP sent to your phone!" });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
-//export gareko
+
+// 4. Reset Password 
+authRouter.post('/api/reset-password', async (req, res) => {
+    try {
+        const { phone, otp, newPassword } = req.body;
+        const user = await User.findOne({ 
+            phone, 
+            passwordResetOtp: otp, 
+            passwordResetExpires: { $gt: Date.now() } 
+        });
+
+        if (!user) return res.status(400).json({ msg: "Invalid or expired OTP!" });
+
+        user.password = await bcryptjs.hash(newPassword, 8);
+        user.passwordResetOtp = undefined;
+        user.passwordResetExpires = undefined;
+        await user.save();
+
+        res.json({ msg: "Password updated successfully!" });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 module.exports = authRouter;

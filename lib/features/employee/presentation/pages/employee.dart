@@ -1,3 +1,4 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
 
@@ -14,13 +15,7 @@ class EmployeePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Employee Page',
-          style: TextStyle(color: AppPallete.whiteColor),
-        ),
-        backgroundColor: AppPallete.backgroundColor,
-      ),
+      appBar: const CommonAppBar(title: 'Employee Dashboard'),
       body: Container(
         width: double.infinity,
         height: double.infinity,

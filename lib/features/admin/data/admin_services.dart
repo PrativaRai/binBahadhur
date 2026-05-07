@@ -28,10 +28,9 @@ class AdminServices {
         response: res,
         context: context,
         onSuccess: () {
-          for (int i = 0; i < jsonDecode(res.body).length; i++) {
-            complainList.add(
-              ComplainModel.fromJson(jsonEncode(jsonDecode(res.body)[i])),
-            );
+          final List decodedBody = jsonDecode(res.body);
+          for (int i = 0; i < decodedBody.length; i++) {
+            complainList.add(ComplainModel.fromMap(decodedBody[i]));
           }
         },
       );
@@ -73,7 +72,7 @@ class AdminServices {
   // 3. UPDATE USER STATUS (SUSPEND/BLOCK)
   void updateUserStatus({
     required BuildContext context,
-    required String email,
+    required String phoneNumber, // CHANGED: parameter name
     required String status,
     required VoidCallback onSuccess,
   }) async {
@@ -86,7 +85,8 @@ class AdminServices {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': userProvider.user.token,
         },
-        body: jsonEncode({'email': email, 'targetStatus': status}),
+
+        body: jsonEncode({'phoneNumber': phoneNumber, 'targetStatus': status}),
       );
 
       if (!context.mounted) return;

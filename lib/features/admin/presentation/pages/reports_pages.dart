@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 
 class ReportsPage extends StatefulWidget {
-  static const String routeName = '/reports-page';
+  static const String routeName = '/ReportsPage';
   const ReportsPage({super.key});
 
   @override
@@ -151,7 +151,6 @@ class _ReportsPageState extends State<ReportsPage> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Visual indicator for "Urgent/New"
                   Container(width: 6, color: AppPallete.red),
                   Expanded(
                     child: Padding(
@@ -164,7 +163,7 @@ class _ReportsPageState extends State<ReportsPage> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  data.email,
+                                  data.phoneNumber, // CHANGED from data.email
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -174,9 +173,10 @@ class _ReportsPageState extends State<ReportsPage> {
                                 ),
                               ),
                               const Icon(
-                                Icons.report_problem_outlined,
+                                Icons
+                                    .phone_android, // Updated icon to match phone theme
                                 size: 18,
-                                color: AppPallete.red,
+                                color: AppPallete.backgroundColor,
                               ),
                             ],
                           ),

@@ -13,9 +13,9 @@ class Complain extends StatefulWidget {
 }
 
 class _ComplainState extends State<Complain> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController DescriptionController = TextEditingController();
-  final TextEditingController EmployeeController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+  final TextEditingController employeeController = TextEditingController();
   final EmployeeServices employeeServices = EmployeeServices();
 
   final _addComplainFormKey = GlobalKey<FormState>();
@@ -23,18 +23,18 @@ class _ComplainState extends State<Complain> {
   @override
   void dispose() {
     super.dispose();
-    emailController.dispose();
-    DescriptionController.dispose();
-    EmployeeController.dispose();
+    phoneController.dispose();
+    descriptionController.dispose();
+    employeeController.dispose();
   }
 
   void complain() {
     if (_addComplainFormKey.currentState!.validate()) {
       employeeServices.complain(
         context: context,
-        email: emailController.text,
-        description: DescriptionController.text,
-        employee: EmployeeController.text,
+        phoneNumber: phoneController.text,
+        description: descriptionController.text,
+        employee: employeeController.text,
       );
     }
   }
@@ -43,8 +43,8 @@ class _ComplainState extends State<Complain> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: const Text(
+        title: const Center(
+          child: Text(
             'Complain',
             style: TextStyle(color: AppPallete.whiteColor),
           ),
@@ -52,7 +52,6 @@ class _ComplainState extends State<Complain> {
         backgroundColor: AppPallete.backgroundColor,
       ),
       backgroundColor: AppPallete.whiteColor,
-
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
@@ -60,25 +59,24 @@ class _ComplainState extends State<Complain> {
             key: _addComplainFormKey,
             child: Column(
               children: [
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CustomTextField(
-                  controller: emailController,
-                  hintText: " Email",
+                  controller: phoneController,
+                  hintText: "Phone Number",
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CustomTextField(
-                  controller: DescriptionController,
+                  controller: descriptionController,
                   hintText: "What is bothering you?",
-                  maxLines: 3, //description the size hunxa
+                  maxLines: 3,
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CustomTextField(
-                  controller: EmployeeController,
+                  controller: employeeController,
                   hintText: "Employee name/Id",
                 ),
-
-                SizedBox(height: 20),
-                CustomButton(text: " Submit", onTap: complain),
+                const SizedBox(height: 20),
+                CustomButton(text: "Submit", onTap: complain),
               ],
             ),
           ),

@@ -18,18 +18,34 @@ class ButtonGroup extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-            padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 15),
+        InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(15),
+          child: Container(
+            padding: const EdgeInsets.all(20), // Standard padding for the icon
+            decoration: BoxDecoration(
+              color: const Color(0xFFFBFBFB),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(icon, size: 40, color: AppPallete.backgroundColor),
           ),
-          onPressed: onPressed,
-          child: Icon(icon, size: 60, color: AppPallete.backgroundColor),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 12),
         Text(
           label,
-          style: const TextStyle(fontSize: 16, color: AppPallete.blackColor),
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF4A4A4A),
+            fontWeight: FontWeight.w500,
+          ),
           textAlign: TextAlign.center,
         ),
       ],

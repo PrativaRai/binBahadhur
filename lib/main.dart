@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
       title: 'binBahadhur',
       theme: AppTheme.darkThemeMode,
       onGenerateRoute: (settings) => AppRouter.generateRoute(settings),
-
+      // home: AdminPage(),
       home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
     );
   }

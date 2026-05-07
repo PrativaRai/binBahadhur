@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
+import 'package:binbahadhur/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:binbahadhur/core/theme/app_pallete.dart';
@@ -17,15 +18,16 @@ class SigninPage extends StatefulWidget {
 
 class _SigninPageState extends State<SigninPage> {
   final AuthServices authservices = AuthServices();
-  // Controllers
 
-  final emailController = TextEditingController();
+  // Controllers - Updated to use phone
+  final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    emailController.dispose();
+    phoneController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -33,7 +35,7 @@ class _SigninPageState extends State<SigninPage> {
   void signInUser() {
     authservices.signInUser(
       context: context,
-      email: emailController.text,
+      phone: phoneController.text,
       password: passwordController.text,
     );
   }
@@ -59,34 +61,55 @@ class _SigninPageState extends State<SigninPage> {
               ),
               const SizedBox(height: 25),
 
-              AuthField(hintText: "Email", controller: emailController),
+              // Phone Field
+              AuthField(hintText: "Phone Number", controller: phoneController),
               const SizedBox(height: 15),
 
+              // Password Field
               AuthField(
                 hintText: "Password",
                 controller: passwordController,
                 isObscureText: true,
               ),
+              const SizedBox(height: 10),
+
+              // Forgot Password Link
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ForgotPasswordPage(),
+                    ),
+                  );
+                },
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                      color: AppPallete.backgroundColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
 
               const SizedBox(height: 25),
 
+              // Sign In Button
               AuthButton(
                 buttonText: 'Sign In',
                 onTap: () {
-                  print(
-                    "Button was clicked!",
-                  ); // This will show in your VS Code terminal
                   if (formKey.currentState!.validate()) {
-                    print("Form is valid, calling backend...");
                     signInUser();
-                  } else {
-                    print("Form is NOT valid - check the text fields!");
                   }
                 },
               ),
 
               const SizedBox(height: 20),
 
+              // Toggle to Sign Up
               Center(
                 child: GestureDetector(
                   onTap: widget.onSignUpTap,

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User= require('../models/user');
+const User = require('../models/user');
 
 const admin = async (req, res, next) => {
   try {
@@ -7,26 +7,22 @@ const admin = async (req, res, next) => {
     if (!token)
       return res.status(401).json({ msg: "No auth token, access denied" });
 
-    const verified = jwt.verify(token, "passwordKey");
+    // Use process.env.JWT_SECRET instead of a hardcoded string for security
+    const verified = jwt.verify(token, "passwordKey"); 
     if (!verified)
       return res
         .status(401)
         .json({ msg: "Token verification failed, authorization denied." });
- const user = await User.findById(verified.id);
 
- if (!user) {
-        return res.status(401).json({ msg: "User not found!" });
+    const user = await User.findById(verified.id);
+
+    if (!user) {
+      return res.status(401).json({ msg: "User not found!" });
     }
 
-
-   // uncomment it later
-
- //if(user.type=='user'|| user.type=='employee'){
-//    return res.status(401).json({msg:"You are not an admin!"})
-// }
-
- if (user.type !== 'user') {
-      return res.status(403).json({ msg: "You are not an admin!" });
+   
+    if (user.type !== 'admin') {
+      return res.status(403).json({ msg: "Access denied. You are not an admin!" });
     }
 
     req.user = verified.id;

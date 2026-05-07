@@ -1,19 +1,23 @@
-const expresss = require('express');
-const employeeRouter = expresss.Router();
-const employee = require('../middleware/employee');
+const express = require('express');
+const employeeRouter = express.Router();
+const employeeMiddleware = require('../middleware/employee');
 const Complain = require('../models/complain'); 
 
-//adding complain
-employeeRouter.post('/employee/add-complain', employee, async(req, res)=>{
-    try{
-    const{email, description,employee}=req.body;
-    let complain = new Complain({
-        email, description,employee,userId: req.user
-    });
-    complain= await complain.save();
-    res.json(complain);
-    }catch(e){
-     res.status(500).json({error: e.message})
+// Adding complain
+employeeRouter.post('/employee/add-complain', employeeMiddleware, async (req, res) => {
+    try {
+        const { phoneNumber, description, employee } = req.body;
+        let complain = new Complain({
+            phoneNumber, 
+            description,
+            employee,
+            userId: req.user // Passed from the middleware
+        });
+        complain = await complain.save();
+        res.json(complain);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
     }
-}  )
-module.exports=employeeRouter;
+});
+
+module.exports = employeeRouter;

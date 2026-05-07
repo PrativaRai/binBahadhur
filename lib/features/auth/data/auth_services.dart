@@ -3,6 +3,7 @@ import 'package:binbahadhur/core/constants/global_variable.dart';
 import 'package:binbahadhur/core/constants/utils.dart';
 import 'package:binbahadhur/core/error/error_handling.dart';
 import 'package:binbahadhur/features/auth/domain/user.dart';
+import 'package:binbahadhur/features/auth/presentation/pages/welcome_page.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/admin_page.dart';
@@ -16,14 +17,14 @@ class AuthServices {
   // Sign up user
   void signUpUser({
     required BuildContext context,
-    required String email,
+    required String phone,
     required String password,
     required String name,
   }) async {
     try {
       User user = User(
         id: '',
-        email: email,
+        phone: phone,
         name: name,
         type: 'user',
         token: '',
@@ -46,7 +47,7 @@ class AuthServices {
         onSuccess: () {
           showSnackBar(
             context,
-            'Account Created! Login with the same credentials!',
+            'Account Created! Login with your phone number!',
           );
         },
       );
@@ -58,13 +59,13 @@ class AuthServices {
   // Sign in user
   void signInUser({
     required BuildContext context,
-    required String email,
+    required String phone,
     required String password,
   }) async {
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/api/signin'),
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({'phone': phone, 'password': password}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -77,13 +78,12 @@ class AuthServices {
         context: context,
         onSuccess: () async {
           SharedPreferences prefs = await SharedPreferences.getInstance();
-
           final userProvider = Provider.of<UserProvider>(
             context,
             listen: false,
           );
-          userProvider.setUser(res.body);
 
+          userProvider.setUser(res.body);
           await prefs.setString('x-auth-token', jsonDecode(res.body)['token']);
 
           if (!context.mounted) return;
@@ -102,6 +102,101 @@ class AuthServices {
             nextRoute,
             (route) => false,
           );
+        },
+      );
+    } catch (e) {
+      if (context.mounted) showSnackBar(context, e.toString());
+    }
+  }
+
+  // Logout user - Redirects to HomePage
+  void logOut(BuildContext context) async {
+    try {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+
+      // 1. Clear the token from local storage
+      await sharedPreferences.setString('x-auth-token', '');
+
+      // 2. Clear the user provider data
+      if (!context.mounted) return;
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      userProvider.setUser(
+        jsonEncode({
+          'id': '',
+          'name': '',
+          'phone': '',
+          'password': '',
+          'type': '',
+          'token': '',
+        }),
+      );
+
+      // 3. Redirect to HomePage and clear navigation stack
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        WelcomePage.routeName,
+        (route) => false,
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
+    }
+  }
+
+  // Send OTP for Forgot Password
+  void sendOtp({required BuildContext context, required String phone}) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$uri/api/forgot-password'),
+        body: jsonEncode({'phone': phone}),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (!context.mounted) return;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, 'OTP Sent! Check your terminal for testing.');
+        },
+      );
+    } catch (e) {
+      if (context.mounted) showSnackBar(context, e.toString());
+    }
+  }
+
+  // Reset Password using OTP
+  void resetPassword({
+    required BuildContext context,
+    required String phone,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$uri/api/reset-password'),
+        body: jsonEncode({
+          'phone': phone,
+          'otp': otp,
+          'newPassword': newPassword,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (!context.mounted) return;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, 'Password updated! Please login.');
+          Navigator.pop(context);
         },
       );
     } catch (e) {
@@ -128,23 +223,27 @@ class AuthServices {
         },
       );
 
-      var response = jsonDecode(tokenRes.body);
+      if (tokenRes.statusCode == 200) {
+        var response = jsonDecode(tokenRes.body);
 
-      if (response == true) {
-        http.Response userRes = await http.get(
-          Uri.parse('$uri/'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            'x-auth-token': token,
-          },
-        );
+        if (response == true) {
+          http.Response userRes = await http.get(
+            Uri.parse('$uri/'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'x-auth-token': token,
+            },
+          );
 
-        if (!context.mounted) return;
-        var userProvider = Provider.of<UserProvider>(context, listen: false);
-        userProvider.setUser(userRes.body);
+          if (!context.mounted) return;
+          var userProvider = Provider.of<UserProvider>(context, listen: false);
+          userProvider.setUser(userRes.body);
+        }
+      } else {
+        debugPrint("Server returned non-200 status: ${tokenRes.statusCode}");
       }
     } catch (e) {
-      // Background task failed, usually due to no internet
+      debugPrint("Error in getUserData: $e");
     }
   }
 }

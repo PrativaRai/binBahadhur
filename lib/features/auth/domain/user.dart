@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class User {
   final String id;
-  final String email;
+  final String phone;
   final String password;
   final String name;
   final String token;
@@ -11,7 +11,7 @@ class User {
 
   User({
     required this.id,
-    required this.email,
+    required this.phone,
     required this.password,
     required this.name,
     required this.type,
@@ -25,7 +25,7 @@ class User {
 
   User copyWith({
     String? id,
-    String? email,
+    String? phone,
     String? password,
     String? name,
     String? token,
@@ -33,7 +33,7 @@ class User {
   }) {
     return User(
       id: id ?? this.id,
-      email: email ?? this.email,
+      phone: phone ?? this.phone,
       password: password ?? this.password,
       name: name ?? this.name,
       token: token ?? this.token,
@@ -44,7 +44,7 @@ class User {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'email': email,
+      'phone': phone,
       'password': password,
       'name': name,
       'type': type,
@@ -54,9 +54,8 @@ class User {
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
-      // MongoDB uses '_id', not 'id'. We check both just in case.
       id: (map['_id'] ?? map['id'] ?? '') as String,
-      email: (map['email'] ?? '') as String,
+      phone: (map['phone'] ?? '') as String,
       password: (map['password'] ?? '') as String,
       name: (map['name'] ?? '') as String,
       type: (map['type'] ?? '') as String,

@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class ComplainModel {
-  final String email;
+  final String phoneNumber;
   final String description;
   final String employee;
   final String? id;
   final String? userId;
+
   ComplainModel({
-    required this.email,
+    required this.phoneNumber,
     required this.description,
     required this.employee,
     this.id,
@@ -17,7 +17,7 @@ class ComplainModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'email': email,
+      'phoneNumber': phoneNumber,
       'description': description,
       'employee': employee,
       'id': id,
@@ -27,11 +27,11 @@ class ComplainModel {
 
   factory ComplainModel.fromMap(Map<String, dynamic> map) {
     return ComplainModel(
-      email: map['email'] as String,
-      description: map['description'] as String,
-      employee: map['employee'] as String,
-      id: map['_id'] != null ? map['_id'] as String : '',
-      userId: map['userId'] != null ? map['userId'] as String : null,
+      phoneNumber: map['phoneNumber'] ?? '',
+      description: map['description'] ?? '',
+      employee: map['employee'] ?? '',
+      id: map['_id'] ?? '',
+      userId: map['userId'] ?? null,
     );
   }
 
