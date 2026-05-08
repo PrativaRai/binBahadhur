@@ -9,11 +9,13 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title),
-      // Set the background color to your app pallete color
-      backgroundColor: AppPallete.backgroundColor,
-      // Remove the shadow so it blends with the scaffold body
       elevation: 0,
+      centerTitle: true,
+      title: Text(
+        title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: AppPallete.backgroundColor,
       // Ensure the text and icons are visible (e.g., white or black)
       iconTheme: const IconThemeData(color: Colors.white),
       titleTextStyle: const TextStyle(

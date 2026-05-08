@@ -11,10 +11,15 @@ import 'package:binbahadhur/features/schedule_pickup/presentation/pages/sp_descr
 class PhotoPreviewPage extends StatefulWidget {
   final File imageFile;
   final String mode;
+  final String? scheduleId;
+  final String? reportId;
+
   const PhotoPreviewPage({
     super.key,
     required this.imageFile,
     required this.mode,
+    this.scheduleId,
+    this.reportId,
   });
 
   @override
@@ -28,6 +33,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
   @override
   void initState() {
     super.initState();
+
     if (widget.mode == "schedule") {
       loadModelAndPredict();
     } else {
@@ -54,11 +60,13 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
       ];
 
       if (!mounted) return;
+
       setState(() {
-        predictedLabel = classIndex >= 0 ? labels[classIndex] : "Unknown";
+        predictedLabel = (classIndex >= 0 && classIndex < labels.length)
+            ? labels[classIndex]
+            : "Unknown";
       });
     } catch (e) {
-      print("Model loading/predicting failed: $e");
       if (!mounted) return;
       setState(() {
         predictedLabel = "Prediction failed";
@@ -82,6 +90,9 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                 Image.file(widget.imageFile, width: 250),
 
                 const SizedBox(height: 20),
+
+                // Schedule flow ma matra prediction dekhauxa, report flow ma dekhaundaina same preview page use gareko chha tara mode ma schedule
+                //ho ki report ho vanera check garera dekhauxa
                 if (widget.mode == "schedule")
                   Text(
                     "Prediction: $predictedLabel",
@@ -90,9 +101,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       fontWeight: FontWeight.bold,
                       color: AppPallete.backgroundColor,
                     ),
-                  )
-                else
-                  const SizedBox.shrink(),
+                  ),
 
                 const SizedBox(height: 20),
 
@@ -104,30 +113,61 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
                       text: "Retake",
                       onPressed: () => Navigator.pop(context),
                     ),
+
                     const SizedBox(width: 20),
+
                     CustomButton(
                       color: AppPallete.backgroundColor,
                       text: "Save",
                       onPressed: () {
-                        Widget page;
+                        /// yo chahi report page ko lagi ho, report submit garepachi aru details haru thapna lai tei report id pass garera aru details page ma jancha
 
                         if (widget.mode == "report") {
-                          page = RRSaveDetailsPage(imageFile: widget.imageFile);
-                        } else if (widget.mode == "schedule") {
-                          page = SPSaveDetailsPage(
-                            imageFile: widget.imageFile,
-                            prediction: predictedLabel,
-                          );
-                        } else {
-                          page = RRSaveDetailsPage(
-                            imageFile: widget.imageFile,
-                          ); // fallback
-                        }
+                          final id = widget.reportId;
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => page),
-                        );
+                          if (id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Report ID missing"),
+                              ),
+                            );
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => RRSaveDetailsPage(
+                                imageFile: widget.imageFile,
+                                reportId: id,
+                              ),
+                            ),
+                          );
+                        }
+                        /// yo chahi schedule page ko lagi ho, schedule submit garepachi aru details haru thapna lai tei schedule id pass garera aru details page ma jancha
+                        else if (widget.mode == "schedule") {
+                          final id = widget.scheduleId;
+
+                          if (id == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Schedule ID missing"),
+                              ),
+                            );
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SPSaveDetailsPage(
+                                imageFile: widget.imageFile,
+                                prediction: predictedLabel,
+                                scheduleId: id,
+                              ),
+                            ),
+                          );
+                        }
                       },
                     ),
                   ],

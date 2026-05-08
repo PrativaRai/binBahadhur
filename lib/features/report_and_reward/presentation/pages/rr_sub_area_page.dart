@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/widgets/area_list_tile.dart';
 import 'package:binbahadhur/core/widgets/bottom_nav_bar.dart';
 import 'package:binbahadhur/core/widgets/custom_big_button.dart';
-import 'package:binbahadhur/features/report_and_reward/presentation/pages/report_page.dart';
-import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/report_and_reward/data/report_service.dart';
+import 'package:binbahadhur/features/report_and_reward/presentation/pages/report_page.dart';
 
 class RRSubAreaPage extends StatefulWidget {
   final String selectedArea;
@@ -22,8 +22,46 @@ class RRSubAreaPage extends StatefulWidget {
 class _RRSubAreaPageState extends State<RRSubAreaPage> {
   String? selectedSubArea;
   int currentIndex = 0;
+  bool isLoading = false;
 
-@override
+  Future<void> proceedToReport() async {
+    if (selectedSubArea == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please select a sub-area")));
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    final reportId = await ReportService().createReport(
+      context: context,
+      area: widget.selectedArea,
+      subArea: selectedSubArea!,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      isLoading = false;
+    });
+
+    if (reportId == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to create report")));
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ReportPage(reportId: reportId)),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -63,12 +101,15 @@ class _RRSubAreaPageState extends State<RRSubAreaPage> {
                 color: Color(0xFF4D4D4D),
               ),
             ),
+
             const SizedBox(height: 16),
+
             Expanded(
               child: ListView.builder(
                 itemCount: widget.subAreas.length,
                 itemBuilder: (context, index) {
                   final subArea = widget.subAreas[index];
+
                   return AreaListTile(
                     title: subArea,
                     isSelected: selectedSubArea == subArea,
@@ -81,28 +122,12 @@ class _RRSubAreaPageState extends State<RRSubAreaPage> {
                 },
               ),
             ),
+
             SizedBox(
               width: double.infinity,
               child: CustomBigButton(
-                text: "Continue",
-                onPressed: () async {
-  if (selectedSubArea == null) return;
-
-  // send data to server
-  await ReportService().createReport(
-    context: context,
-    area: widget.selectedArea,
-    subArea: selectedSubArea!,
-  );
-
-  // go to report page
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const ReportPage(),
-    ),
-  );
-},
+                text: isLoading ? "Loading..." : "Continue",
+                onPressed: proceedToReport,
               ),
             ),
           ],

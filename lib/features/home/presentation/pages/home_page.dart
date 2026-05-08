@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/core/widgets/custom_option.dart';
-import 'package:binbahadhur/features/report_and_reward/presentation/pages/report_page.dart';
+
 import 'package:binbahadhur/features/schedule_pickup/presentation/pages/area_page.dart';
 import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_area_page.dart';
+import 'package:provider/provider.dart';
+import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 
 class HomePage extends StatelessWidget {
   static const String routeName = '/home';
@@ -15,11 +17,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String name = "Ram";
+    final user = Provider.of<UserProvider>(context).user;
+    final String name = user.name ?? "User";
     final String date = DateFormat('EEEE, d MMM').format(DateTime.now());
 
     return Scaffold(
-      appBar: const CommonAppBar(title: 'User Dashboard'),
+      appBar: const CommonAppBar(title: 'Home'),
       body: Column(
         children: [
           Container(
@@ -39,7 +42,7 @@ class HomePage extends StatelessWidget {
                           Text(
                             "Hello, $name!",
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 30,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),

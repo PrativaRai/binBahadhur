@@ -7,7 +7,14 @@ import 'package:binbahadhur/core/widgets/custom_app_bar.dart';
 
 class CameraPage extends StatefulWidget {
   final String mode;
-  const CameraPage({super.key, required this.mode});
+  final String? scheduleId;
+  final String? reportId;
+  const CameraPage({
+    super.key,
+    required this.mode,
+    this.scheduleId,
+    this.reportId,
+  });
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -74,6 +81,8 @@ class _CameraPageState extends State<CameraPage> {
                         builder: (context) => PhotoPreviewPage(
                           imageFile: File(picture.path),
                           mode: widget.mode,
+                          scheduleId: widget.scheduleId,
+                          reportId: widget.reportId,
                         ),
                       ),
                     );

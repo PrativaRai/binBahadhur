@@ -1,26 +1,25 @@
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-dns.setServers(['8.8.8.8', '8.8.4.4']);
+const dns = require("dns");
+dns.setDefaultResultOrder("ipv4first");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
-//Imports contain garxa packages ko 
+//Imports contain garxa packages ko
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 
 //Import other files
 
-const authRouter= require("./routes/auth");
+const authRouter = require("./routes/auth");
 const employeeRouter = require("./routes/employee");
 const adminRouter = require("./routes/admin");
-const scheduleRouter = require('./routes/schedule');
-const reportRouter = require('./routes/report');
+const scheduleRouter = require("./routes/schedule");
+const reportRouter = require("./routes/report");
 
 //init
-const PORT=process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 const DB = process.env.DB;
-const app=express();
-
+const app = express();
 
 //middleware
 app.use(express.json());
@@ -28,6 +27,10 @@ app.use(authRouter);
 app.use(employeeRouter);
 app.use(adminRouter);
 app.use(scheduleRouter);
+
+//static files uploads(images)
+app.use("/uploads", express.static("uploads"));
+
 app.use(reportRouter);
 
 //validation
@@ -38,14 +41,15 @@ if (!DB) {
 
 //connections
 
-mongoose.connect(DB).then(() =>{
-    console.log('connection successful');
-})
-.catch((e)=>{
+mongoose
+  .connect(DB)
+  .then(() => {
+    console.log("connection successful");
+  })
+  .catch((e) => {
     console.log(e);
-})
+  });
 
-
-app.listen(PORT,"0.0.0.0",()=>{
-    console.log(`Server is running at port ${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running at port ${PORT}`);
 });

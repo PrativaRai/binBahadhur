@@ -4,7 +4,8 @@ import 'package:binbahadhur/core/widgets/custom_option.dart';
 import 'package:binbahadhur/features/trash_detection/presentation/pages/camera_page.dart';
 
 class ReportPage extends StatelessWidget {
-  const ReportPage({super.key});
+  final String reportId;
+  const ReportPage({super.key, required this.reportId});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,11 @@ class ReportPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CameraPage(mode: "report"),
+                    builder: (_) => CameraPage(
+                      mode: "report",
+                      reportId: reportId,
+                      scheduleId: null,
+                    ),
                   ),
                 );
               },
