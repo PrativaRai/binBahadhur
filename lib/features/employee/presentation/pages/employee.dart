@@ -1,5 +1,4 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
-import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
 
 import 'package:binbahadhur/features/employee/presentation/widgets/button.dart';

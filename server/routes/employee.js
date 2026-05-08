@@ -11,7 +11,7 @@ employeeRouter.post('/employee/add-complain', employeeMiddleware, async (req, re
             phoneNumber, 
             description,
             employee,
-            userId: req.user // Passed from the middleware
+            userId: req.user
         });
         complain = await complain.save();
         res.json(complain);
