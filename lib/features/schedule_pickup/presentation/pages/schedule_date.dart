@@ -39,9 +39,16 @@ class _ScheduleDatePageState extends State<ScheduleDatePage> {
 
   // available time options for dropdown
   final List<String> timeSlots = [
-    '8 AM', '9 AM', '10 AM', '11 AM',
-    '12 PM', '1 PM', '2 PM', '3 PM',
-    '4 PM', '5 PM'
+    '8 AM',
+    '9 AM',
+    '10 AM',
+    '11 AM',
+    '12 PM',
+    '1 PM',
+    '2 PM',
+    '3 PM',
+    '4 PM',
+    '5 PM',
   ];
 
   // opens calendar popup for user to pick a date
@@ -166,21 +173,31 @@ class _ScheduleDatePageState extends State<ScheduleDatePage> {
               GestureDetector(
                 onTap: _pickDate,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 18, color: Colors.grey),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: Colors.grey,
+                      ),
                       const SizedBox(width: 10),
                       // shows selected date or placeholder
                       Text(
                         selectedDate == null
                             ? 'Select Date'
                             : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-                        style: const TextStyle(fontSize: 14, color: Colors.black87),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
                       ),
                     ],
                   ),
@@ -227,29 +244,34 @@ class _ScheduleDatePageState extends State<ScheduleDatePage> {
               width: double.infinity,
               child: CustomBigButton(
                 text: "Continue",
-                                 
-onPressed: () async {
-  if (selectedType == null) return;
-  
-  // send data to server
-  await ScheduleService().createSchedule(
-    context: context,
-    area: widget.selectedArea,
-    subArea: widget.selectedSubArea,
-    scheduleType: selectedType!,
-    scheduledDate: selectedDate,
-    scheduledTime: selectedTime,
-  );
 
-  // go to next screen
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const SchedulePage(),
-    ),
-  );
-},
-                
+                onPressed: () async {
+                  if (selectedType == null) return;
+
+                  // create schedule and get scheduleId from backend
+                  final scheduleId = await ScheduleService().createSchedule(
+                    context: context,
+                    area: widget.selectedArea,
+                    subArea: widget.selectedSubArea,
+                    scheduleType: selectedType!,
+                    scheduledDate: selectedDate,
+                    scheduledTime: selectedTime,
+                  );
+
+                  if (scheduleId == null) {
+                    print("Schedule creation failed");
+                    return;
+                  }
+
+                  // move to next page with scheduleId
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          SchedulePage(scheduleId: scheduleId),
+                    ),
+                  );
+                },
               ),
             ),
           ],
