@@ -1,3 +1,7 @@
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 //Imports contain garxa packages ko 
 require("dotenv").config();
 const express = require("express");
@@ -9,6 +13,8 @@ const jwt = require('jsonwebtoken');
 const authRouter= require("./routes/auth");
 const employeeRouter = require("./routes/employee");
 const adminRouter = require("./routes/admin");
+const scheduleRouter = require('./routes/schedule');
+const reportRouter = require('./routes/report');
 
 //init
 const PORT=process.env.PORT || 3000;
@@ -21,6 +27,8 @@ app.use(express.json());
 app.use(authRouter);
 app.use(employeeRouter);
 app.use(adminRouter);
+app.use(scheduleRouter);
+app.use(reportRouter);
 
 //validation
 if (!DB) {
