@@ -1,6 +1,6 @@
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:flutter/material.dart';
-
+//ontap option
 class ServiceCard extends StatelessWidget {
   final IconData icon;
   final String label;

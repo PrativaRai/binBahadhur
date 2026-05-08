@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
-
+//continue button
 class CustomBigButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
@@ -14,7 +14,7 @@ class CustomBigButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12.0), // 👈 default margin
+      padding: const EdgeInsets.all(12.0), 
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

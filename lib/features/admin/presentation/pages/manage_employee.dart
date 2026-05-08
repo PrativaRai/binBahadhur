@@ -65,7 +65,7 @@ class _ManageEmployeeState extends State<ManageEmployee> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isSuspendMode ? 'Suspend Employee' : 'Lift Suspension',
+          isSuspendMode ? 'Suspend' : 'Lift Suspension',
           style: const TextStyle(color: AppPallete.whiteColor),
         ),
         centerTitle: true,
@@ -98,10 +98,7 @@ class _ManageEmployeeState extends State<ManageEmployee> {
                 ),
               const SizedBox(height: 15),
 
-              CustomTextField(
-                controller: employeeController,
-                hintText: "Employee Name",
-              ),
+              CustomTextField(controller: employeeController, hintText: "Name"),
 
               const SizedBox(height: 30),
 
@@ -125,7 +122,9 @@ class _ManageEmployeeState extends State<ManageEmployee> {
                       ? "Need to remove a suspension?"
                       : "Back to Suspend Page",
                   style: TextStyle(
-                    color: isSuspendMode ? Colors.grey : Colors.green,
+                    color: isSuspendMode
+                        ? AppPallete.backgroundColor
+                        : Colors.green,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

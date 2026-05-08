@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:binbahadhur/core/constants/global_variable.dart';
 import 'package:binbahadhur/core/constants/utils.dart';
 import 'package:binbahadhur/core/error/error_handling.dart';
-import 'package:binbahadhur/features/auth/domain/user.dart';
 import 'package:binbahadhur/features/auth/presentation/pages/welcome_page.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
@@ -14,26 +13,16 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthServices {
-  // Sign up user
-  void signUpUser({
+  // 1. Send WhatsApp OTP (Signup)
+  void sendWhatsAppOTP({
     required BuildContext context,
     required String phone,
-    required String password,
-    required String name,
+    required VoidCallback onSuccess,
   }) async {
     try {
-      User user = User(
-        id: '',
-        phone: phone,
-        name: name,
-        type: 'user',
-        token: '',
-        password: password,
-      );
-
       http.Response res = await http.post(
-        Uri.parse('$uri/api/signup'),
-        body: user.toJson(),
+        Uri.parse('$uri/api/send-otp'),
+        body: jsonEncode({'phone': phone}),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -45,9 +34,48 @@ class AuthServices {
         response: res,
         context: context,
         onSuccess: () {
-          showSnackBar(
+          showSnackBar(context, 'OTP sent to your WhatsApp!');
+          onSuccess(); // Triggers the UI change (dialog or state)
+        },
+      );
+    } catch (e) {
+      if (context.mounted) showSnackBar(context, "Server Error: $e");
+    }
+  }
+
+  // 2. Final Sign Up
+  void signUpWithWhatsApp({
+    required BuildContext context,
+    required String name,
+    required String phone,
+    required String password,
+    required String otp,
+  }) async {
+    try {
+      http.Response res = await http.post(
+        Uri.parse('$uri/api/signup'),
+        body: jsonEncode({
+          'name': name,
+          'phone': phone,
+          'password': password,
+          'otp': otp,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (!context.mounted) return;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, 'Account Created! Please Login.');
+          Navigator.pushNamedAndRemoveUntil(
             context,
-            'Account Created! Login with your phone number!',
+            WelcomePage.routeName,
+            (route) => false,
           );
         },
       );
@@ -56,7 +84,7 @@ class AuthServices {
     }
   }
 
-  // Sign in user
+  // 3. Sign In User
   void signInUser({
     required BuildContext context,
     required String phone,
@@ -109,43 +137,12 @@ class AuthServices {
     }
   }
 
-  // Logout user - Redirects to HomePage
-  void logOut(BuildContext context) async {
-    try {
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
-
-      // 1. Clear the token from local storage
-      await sharedPreferences.setString('x-auth-token', '');
-
-      // 2. Clear the user provider data
-      if (!context.mounted) return;
-      var userProvider = Provider.of<UserProvider>(context, listen: false);
-
-      userProvider.setUser(
-        jsonEncode({
-          'id': '',
-          'name': '',
-          'phone': '',
-          'password': '',
-          'type': '',
-          'token': '',
-        }),
-      );
-
-      // 3. Redirect to HomePage and clear navigation stack
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        WelcomePage.routeName,
-        (route) => false,
-      );
-    } catch (e) {
-      showSnackBar(context, e.toString());
-    }
-  }
-
-  // Send OTP for Forgot Password
-  void sendOtp({required BuildContext context, required String phone}) async {
+  // 4. Send Forgot Password OTP
+  void sendForgotPasswordOtp({
+    required BuildContext context,
+    required String phone,
+    required VoidCallback onSuccess,
+  }) async {
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/api/forgot-password'),
@@ -161,7 +158,8 @@ class AuthServices {
         response: res,
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'OTP Sent! Check your terminal for testing.');
+          showSnackBar(context, 'Reset OTP sent to WhatsApp!');
+          onSuccess();
         },
       );
     } catch (e) {
@@ -169,7 +167,7 @@ class AuthServices {
     }
   }
 
-  // Reset Password using OTP
+  // 5. Reset Password
   void resetPassword({
     required BuildContext context,
     required String phone,
@@ -195,7 +193,7 @@ class AuthServices {
         response: res,
         context: context,
         onSuccess: () {
-          showSnackBar(context, 'Password updated! Please login.');
+          showSnackBar(context, 'Password updated successfully!');
           Navigator.pop(context);
         },
       );
@@ -204,7 +202,7 @@ class AuthServices {
     }
   }
 
-  // Get user data
+  // 6. Get User Data (Auto-Login)
   void getUserData(BuildContext context) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -225,7 +223,6 @@ class AuthServices {
 
       if (tokenRes.statusCode == 200) {
         var response = jsonDecode(tokenRes.body);
-
         if (response == true) {
           http.Response userRes = await http.get(
             Uri.parse('$uri/'),
@@ -239,11 +236,40 @@ class AuthServices {
           var userProvider = Provider.of<UserProvider>(context, listen: false);
           userProvider.setUser(userRes.body);
         }
-      } else {
-        debugPrint("Server returned non-200 status: ${tokenRes.statusCode}");
       }
     } catch (e) {
       debugPrint("Error in getUserData: $e");
+    }
+  }
+
+  // 7. Log Out
+  void logOut(BuildContext context) async {
+    try {
+      SharedPreferences sharedPreferences =
+          await SharedPreferences.getInstance();
+      await sharedPreferences.setString('x-auth-token', '');
+
+      if (!context.mounted) return;
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      userProvider.setUser(
+        jsonEncode({
+          'id': '',
+          'name': '',
+          'phone': '',
+          'password': '',
+          'type': '',
+          'token': '',
+        }),
+      );
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        WelcomePage.routeName,
+        (route) => false,
+      );
+    } catch (e) {
+      showSnackBar(context, e.toString());
     }
   }
 }

@@ -1,26 +1,26 @@
 const mongoose = require('mongoose');
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
+   
     name: {
         required: true,
         type: String,
         trim: true,
     },
-
-    phone: { 
-        required: true,
-        type: String,
-        trim: true,
-        unique: true, 
-        validate: {
-            validator: (value) => {
-                const re = /^\d{10}$/; 
-                return value.match(re);
-            },
-            message: "Please enter a valid 10-digit phone number",
+phone: {
+    required: true,
+    type: String,
+    trim: true,
+    unique: true,
+    validate: {
+        validator: (value) => {
+            // This now only allows 10-digit numbers starting with 9
+            const re = /^9\d{9}$/;
+            return re.test(value);
         },
+        message: "Please enter a valid 10-digit phone number.",
     },
-
+},
     password: {
         required: true,
         type: String,
@@ -28,29 +28,21 @@ const userSchema = mongoose.Schema({
             validator: (value) => {
                 return value.length > 6;
             },
-            message: "Please enter a long password",
+            message: "Password must be at least 7 characters long",
         },
     },
-
     type: {
         type: String,
         default: "user",
         enum: ["user", "admin", "employee", "user_provider"],
     },
-
-    status: { 
-        type: String, 
-        default: "active" 
-    },
-
-    // OTP fields
-    passwordResetOtp: {
+    status: {
         type: String,
+        default: "active"
     },
-    passwordResetExpires: {
-        type: Date,
-    },
-});
+}, { timestamps: true }); // Good practice to track when users joined
+
+
 
 const User = mongoose.model("User", userSchema);
 module.exports = User;

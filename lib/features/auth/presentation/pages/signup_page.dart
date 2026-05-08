@@ -17,6 +17,7 @@ class _SignupPageState extends State<SignupPage> {
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+  final otpController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -24,15 +25,89 @@ class _SignupPageState extends State<SignupPage> {
     nameController.dispose();
     phoneController.dispose();
     passwordController.dispose();
+    otpController.dispose();
     super.dispose();
   }
 
-  void signUpUser() {
-    authservices.signUpUser(
+  // 1. Trigger the Node.js WhatsApp OTP
+  void startWhatsappSignupFlow() {
+    // Note: Make sure to create 'sendWhatsAppOTP' in your auth_services.dart
+    authservices.sendWhatsAppOTP(
       context: context,
       phone: phoneController.text,
-      password: passwordController.text,
-      name: nameController.text,
+      onSuccess: () {
+        // Show the dialog once the backend confirms WhatsApp message sent
+        showOtpDialog();
+      },
+    );
+  }
+
+  // 2. The Pop-up UI for WhatsApp OTP
+  void showOtpDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppPallete.whiteColor,
+        title: const Text(
+          "WhatsApp Verification",
+          style: TextStyle(
+            color: AppPallete.blackColor,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "We've sent a 6-digit code to your WhatsApp. Please enter it below.",
+              style: TextStyle(color: AppPallete.blackColor),
+            ),
+            const SizedBox(height: 15),
+            TextField(
+              controller: otpController,
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+              style: const TextStyle(color: AppPallete.blackColor),
+              decoration: InputDecoration(
+                hintText: "Enter OTP",
+                hintStyle: TextStyle(
+                  color: AppPallete.blackColor.withOpacity(0.5),
+                ),
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              otpController.clear();
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel", style: TextStyle(color: Colors.red)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppPallete.backgroundColor,
+            ),
+            onPressed: () {
+              // 3. Final Step: Verify WhatsApp OTP and save to MongoDB
+              authservices.signUpWithWhatsApp(
+                context: context,
+                name: nameController.text,
+                phone: phoneController.text,
+                password: passwordController.text,
+                otp: otpController.text,
+              );
+            },
+            child: const Text(
+              "Verify & Register",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -48,7 +123,7 @@ class _SignupPageState extends State<SignupPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                "Namaste\nHello there, please signup to continue!",
+                "Namaste\nJoin binBahadhur today!",
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -56,9 +131,12 @@ class _SignupPageState extends State<SignupPage> {
                 ),
               ),
               const SizedBox(height: 25),
-              AuthField(hintText: "Name", controller: nameController),
+              AuthField(hintText: "Full Name", controller: nameController),
               const SizedBox(height: 15),
-              AuthField(hintText: "Phone Number", controller: phoneController),
+              AuthField(
+                hintText: "Phone Number (e.g. 98XXXXXXXX)",
+                controller: phoneController,
+              ),
               const SizedBox(height: 15),
               AuthField(
                 hintText: "Password",
@@ -67,10 +145,10 @@ class _SignupPageState extends State<SignupPage> {
               ),
               const SizedBox(height: 25),
               AuthButton(
-                buttonText: 'Sign Up',
+                buttonText: 'Get OTP via WhatsApp',
                 onTap: () {
                   if (formKey.currentState!.validate()) {
-                    signUpUser();
+                    startWhatsappSignupFlow();
                   }
                 },
               ),

@@ -19,12 +19,45 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final newPasswordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
+  bool isCodeSent = false;
+
   @override
   void dispose() {
     phoneController.dispose();
     otpController.dispose();
     newPasswordController.dispose();
     super.dispose();
+  }
+
+  // 1. Updated to use the WhatsApp Service
+  void sendVerificationCode() {
+    if (phoneController.text.length == 10) {
+      authServices.sendForgotPasswordOtp(
+        context: context,
+        phone: phoneController.text,
+        onSuccess: () {
+          setState(() {
+            isCodeSent = true;
+          });
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Enter a valid 10-digit Nepali number")),
+      );
+    }
+  }
+
+  // 2. Updated to verify OTP and Reset via Node.js
+  void handlePasswordUpdate() {
+    if (formKey.currentState!.validate()) {
+      authServices.resetPassword(
+        context: context,
+        phone: phoneController.text,
+        otp: otpController.text,
+        newPassword: newPasswordController.text,
+      );
+    }
   }
 
   @override
@@ -34,6 +67,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       appBar: AppBar(
         title: const Text('Reset Password'),
         backgroundColor: AppPallete.backgroundColor,
+        elevation: 0,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -44,71 +78,63 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Text(
-                  "Enter your phone number to receive a 6-digit verification code.",
-                  style: TextStyle(color: AppPallete.borderColor),
+                Text(
+                  isCodeSent
+                      ? "Enter the code sent to your WhatsApp number."
+                      : "Enter your registered phone number to receive a WhatsApp reset code.",
+                  style: const TextStyle(
+                    color: AppPallete.borderColor,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 25),
 
-                // Phone Input
                 AuthField(
                   hintText: "Phone Number",
                   controller: phoneController,
+                  readOnly: isCodeSent,
                 ),
                 const SizedBox(height: 15),
 
-                //send otp button
-                AuthButton(
-                  buttonText: "Send Verification Code",
-                  onTap: () {
-                    if (phoneController.text.length == 10) {
-                      authServices.sendOtp(
-                        context: context,
-                        phone: phoneController.text,
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Enter a valid 10-digit number"),
-                        ),
-                      );
-                    }
-                  },
-                ),
+                if (!isCodeSent)
+                  AuthButton(
+                    buttonText: "Send WhatsApp Code",
+                    onTap: sendVerificationCode,
+                  ),
 
-                const SizedBox(height: 30),
-                const Divider(),
-                const SizedBox(height: 20),
+                if (isCodeSent) ...[
+                  const SizedBox(height: 10),
+                  const Divider(),
+                  const SizedBox(height: 20),
 
-                // OTP Input
-                AuthField(
-                  hintText: "Enter 6-digit OTP",
-                  controller: otpController,
-                ),
-                const SizedBox(height: 15),
+                  AuthField(
+                    hintText: "6-digit WhatsApp OTP",
+                    controller: otpController,
+                  ),
+                  const SizedBox(height: 15),
 
-                // New Password Input
-                AuthField(
-                  hintText: "New Password",
-                  controller: newPasswordController,
-                  isObscureText: true,
-                ),
-                const SizedBox(height: 25),
+                  AuthField(
+                    hintText: "New Password",
+                    controller: newPasswordController,
+                    isObscureText: true,
+                  ),
+                  const SizedBox(height: 25),
 
-                // Update Button
-                AuthButton(
-                  buttonText: "Update Password",
-                  onTap: () {
-                    if (formKey.currentState!.validate()) {
-                      authServices.resetPassword(
-                        context: context,
-                        phone: phoneController.text,
-                        otp: otpController.text,
-                        newPassword: newPasswordController.text,
-                      );
-                    }
-                  },
-                ),
+                  AuthButton(
+                    buttonText: "Update Password",
+                    onTap: handlePasswordUpdate,
+                  ),
+
+                  Center(
+                    child: TextButton(
+                      onPressed: () => setState(() => isCodeSent = false),
+                      child: const Text(
+                        "Change Phone Number",
+                        style: TextStyle(color: AppPallete.backgroundColor),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

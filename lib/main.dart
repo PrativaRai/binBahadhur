@@ -5,13 +5,13 @@ import 'package:binbahadhur/features/auth/presentation/providers/user_provider.d
 import 'package:binbahadhur/features/employee/presentation/pages/employee.dart';
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
-import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_area_page.dart';
 import 'package:binbahadhur/router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:binbahadhur/features/schedule_pickup/presentation/pages/area_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => UserProvider())],
@@ -33,6 +33,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // user ly poela login gareko xa ki xna vanerw check garxa
     authService.getUserData(context);
   }
 
@@ -45,26 +46,23 @@ class _MyAppState extends State<MyApp> {
       title: 'binBahadhur',
       theme: AppTheme.darkThemeMode,
       onGenerateRoute: (settings) => AppRouter.generateRoute(settings),
-      // home: AdminPage(),
-      home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
-
-        //  home: const AreaPage(),
-      //  home: const RRAreaPage()
-
+      //alreaady logged in xa vane afaii login garney
+      // home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
+      home: AdminPage(),
     );
   }
 
-  Widget _getHome(String type) {
-    switch (type) {
-      case 'admin':
-        return const AdminPage();
-      case 'employee':
-        return const EmployeePage();
-      case 'user_provider':
-        return const HomePage();
-      case 'user':
-      default:
-        return const WelcomePage();
-    }
-  }
+  // based on role kaa janey vanerw determine garxa
+  // Widget _getHome(String type) {
+  //   switch (type) {
+  //     case 'admin':
+  //       return const AdminPage();
+  //     case 'employee':
+  //       return const EmployeePage();
+  //     case 'user':
+  //       return const HomePage();
+  //     default:
+  //       return const WelcomePage();
+  //   }
+  // }
 }

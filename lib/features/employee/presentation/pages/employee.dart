@@ -1,14 +1,44 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
-
 import 'package:binbahadhur/features/employee/presentation/widgets/button.dart';
+import 'package:binbahadhur/features/employee/presentation/widgets/nav_bar.dart';
 import 'package:flutter/material.dart';
 
-class EmployeePage extends StatelessWidget {
+class EmployeePage extends StatefulWidget {
   static const String routeName = '/employee';
+
   const EmployeePage({super.key});
-  void navigatetoComplain(BuildContext context) {
+
+  @override
+  State<EmployeePage> createState() => _EmployeePageState();
+}
+
+class _EmployeePageState extends State<EmployeePage> {
+  int currentIndex = 0;
+
+  // Function for the Grid Buttons
+  void navigateToComplain(BuildContext context) {
     Navigator.pushNamed(context, Complain.routeName);
+  }
+
+  final List<NavItem> navItems = [
+    NavItem(label: "Home", icon: Icons.home),
+    NavItem(label: "Complain", icon: Icons.report),
+    NavItem(label: "Tasks", icon: Icons.work),
+    NavItem(label: "Profile", icon: Icons.person),
+  ];
+
+  // Logic for the Bottom Navigation Bar
+  void onNavTapped(int index) {
+    setState(() {
+      currentIndex = index;
+    });
+
+    if (index == 1) {
+      // Index 1 is "Complain" in your navItems list
+      Navigator.pushNamed(context, Complain.routeName);
+    }
+    // Add other navigation logic for Profile or Tasks here
   }
 
   @override
@@ -20,41 +50,11 @@ class EmployeePage extends StatelessWidget {
         height: double.infinity,
         padding: const EdgeInsets.all(20),
         color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start, // Align content to top
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Wrap(
-              spacing: 50, // horizontal gap between items
-              runSpacing: 30, // vertical gap when wrapped
-              alignment: WrapAlignment.center,
-              children: [
-                // complain group
-                ButtonGroup(
-                  icon: Icons.report,
-                  label: "Complain",
-                  onPressed: () => navigatetoComplain(context),
-                ),
-                // verify
-                ButtonGroup(
-                  icon: Icons.verified,
-                  label: "Verify",
-                  onPressed: () {
-                    // TODO: Add employee management logic
-                  },
-                ),
-                // Task group
-                ButtonGroup(
-                  icon: Icons.star,
-                  label: "Rating",
-                  onPressed: () {
-                    // TODO: Add task management logic
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: currentIndex,
+        onTap: onNavTapped, // This now calls the navigation logic
+        items: navItems,
       ),
     );
   }
