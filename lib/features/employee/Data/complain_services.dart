@@ -23,7 +23,7 @@ class EmployeeServices {
       );
 
       http.Response res = await http.post(
-        Uri.parse('$uri/employee/add-complain'),
+        Uri.parse('$uri/api/worker/add-complain'),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': userProvider.user.token,

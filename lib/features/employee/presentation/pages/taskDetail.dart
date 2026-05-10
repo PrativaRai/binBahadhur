@@ -2,7 +2,7 @@ import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
-import 'package:binbahadhur/features/employee/services/employee_service.dart.dart';
+import 'package:binbahadhur/features/employee/services/employee_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // for date formatting
 import 'package:provider/provider.dart';

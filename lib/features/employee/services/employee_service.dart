@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:binbahadhur/core/constants/global_variable.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class EmployeeService {
@@ -57,23 +59,32 @@ class EmployeeService {
   }
 
   //Add Complaint
-  Future<Map<String, dynamic>> addComplain({
+  static Future<Map<String, dynamic>> addComplain({
+    required BuildContext context,
     required String token,
     required String phoneNumber,
     required String description,
   }) async {
     try {
       final response = await http.post(
-        Uri.parse("$baseUrl/api/worker/add-complain"),
+        Uri.parse("$uri/api/worker/add-complain"),
         headers: {'Content-Type': 'application/json', 'x-auth-token': token},
         body: json.encode({
           'phoneNumber': phoneNumber,
           'description': description,
         }),
       );
-      return _handleResponse(response);
+      final body = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return {'success': true};
+      } else {
+        return {
+          'success': false,
+          'error': body['msg'] ?? 'Failed to add complain',
+        };
+      }
     } catch (e) {
-      return {'success': false, 'error': 'Network error: $e'};
+      return {'success': false, 'error': e.toString()};
     }
   }
 

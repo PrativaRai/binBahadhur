@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class AdminServices {
-  //FETCH ALL COMPLAINTS
+  // 1. FETCH ALL COMPLAINTS
   Future<List<ComplainModel>> fetchAllComplain(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     List<ComplainModel> complainList = [];
@@ -28,28 +28,31 @@ class AdminServices {
         response: res,
         context: context,
         onSuccess: () {
-          final List decodedBody = jsonDecode(res.body);
-          for (int i = 0; i < decodedBody.length; i++) {
-            complainList.add(ComplainModel.fromMap(decodedBody[i]));
+          final Map<String, dynamic> decodedData = jsonDecode(res.body);
+          final List<dynamic> complaintsData = decodedData['complaints'];
+
+          for (int i = 0; i < complaintsData.length; i++) {
+            complainList.add(
+              ComplainModel.fromMap(complaintsData[i] as Map<String, dynamic>),
+            );
           }
         },
       );
     } catch (e) {
       if (context.mounted) {
-        showSnackBar(context, e.toString());
+        showSnackBar(context, "Fetch Error: ${e.toString()}");
       }
     }
     return complainList;
   }
 
-  //DELETE / RESOLVE COMPLAINT
+  // 2. DELETE / RESOLVE COMPLAINT
   void deleteComplain({
     required BuildContext context,
     required ComplainModel complain,
     required VoidCallback onSuccess,
   }) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/admin/delete-complain'),
@@ -57,6 +60,7 @@ class AdminServices {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': userProvider.user.token,
         },
+
         body: jsonEncode({'id': complain.id}),
       );
 
@@ -69,7 +73,7 @@ class AdminServices {
     }
   }
 
-  //UPDATE USER STATUS
+  // 3. UPDATE USER STATUS
   void updateUserStatus({
     required BuildContext context,
     required String phoneNumber,
@@ -77,7 +81,6 @@ class AdminServices {
     required VoidCallback onSuccess,
   }) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
-
     try {
       http.Response res = await http.post(
         Uri.parse('$uri/admin/update-user-status'),
@@ -85,7 +88,6 @@ class AdminServices {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': userProvider.user.token,
         },
-
         body: jsonEncode({'phoneNumber': phoneNumber, 'targetStatus': status}),
       );
 

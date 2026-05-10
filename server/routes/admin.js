@@ -7,8 +7,8 @@ const adminMiddleware = require("../middleware/admin");
 //GET ALL COMPLAINTS
 adminRouter.get('/admin/get-complain', adminMiddleware, async (req, res) => {
     try {
-        const complain = await Complain.find({});
-        res.json(complain);
+        const complain = await Complain.find({}).sort({ createdAt: -1 });
+        res.json({ success: true, complaints: complain });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -33,9 +33,9 @@ adminRouter.post("/admin/update-user-status", adminMiddleware, async (req, res) 
 
         
         const user = await User.findOneAndUpdate(
-            { phoneNumber: phoneNumber }, 
+            { phone: phoneNumber }, 
             { status: targetStatus },
-            { new: true } 
+            { returnDocument: 'after' } 
         );
 
         if (!user) {

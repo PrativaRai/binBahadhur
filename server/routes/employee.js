@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const express = require("express");
 const employeeRouter = express.Router();
 const Schedule = require("../models/schedule");
@@ -126,7 +127,7 @@ employeeRouter.post('/api/worker/add-complain', auth, employeeMiddleware, async 
 // GET /api/profile/:id
 employeeRouter.get("/api/profile/:id", async (req, res) => {
     try {
-        const mongoose = require('mongoose');
+       
         const userId = req.params.id;
 
         const profileData = await User.aggregate([

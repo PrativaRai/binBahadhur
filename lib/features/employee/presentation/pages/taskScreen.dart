@@ -2,7 +2,7 @@ import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/taskDetail.dart';
-import 'package:binbahadhur/features/employee/services/employee_service.dart.dart'; // fixed import (removed extra .dart)
+import 'package:binbahadhur/features/employee/services/employee_service.dart'; // fixed import (removed extra .dart)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -1,9 +1,13 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
+import 'package:binbahadhur/core/constants/utils.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
+import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/Data/complain_services.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/custom_button.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/custom_textfield.dart';
+import 'package:binbahadhur/features/employee/services/employee_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class Complain extends StatefulWidget {
   static const String routeName = '/Complain';
@@ -29,16 +33,32 @@ class _ComplainState extends State<Complain> {
     employeeController.dispose();
   }
 
-  void complain() {
+  void complain() async {
     if (_addComplainFormKey.currentState!.validate()) {
-      employeeServices.complain(
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      // Call the service
+      final result = await EmployeeService.addComplain(
         context: context,
+        token: userProvider.user.token,
         phoneNumber: phoneController.text,
         description: descriptionController.text,
-        employee: employeeController.text,
       );
+
+      // CRITICAL FIX: Check if widget is still in tree
+      if (!mounted) return;
+
+      if (result['success'] == true) {
+        showSnackBar(context, 'Complain added successfully');
+        Navigator.pop(context);
+      } else {
+        showSnackBar(context, result['error']);
+      }
     }
   }
+
+  // In the build method, delete the CustomTextField for "Employee name/Id"
+  // The backend now handles this automatically via the token.
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +75,7 @@ class _ComplainState extends State<Complain> {
                 const SizedBox(height: 10),
                 CustomTextField(
                   controller: phoneController,
-                  hintText: "Phone Number",
+                  hintText: "Enter the User Phone Number",
                 ),
                 const SizedBox(height: 10),
                 CustomTextField(
@@ -66,7 +86,7 @@ class _ComplainState extends State<Complain> {
                 const SizedBox(height: 10),
                 CustomTextField(
                   controller: employeeController,
-                  hintText: "Employee name/Id",
+                  hintText: "Your name",
                 ),
                 const SizedBox(height: 20),
                 CustomButton(text: "Submit", onTap: complain),
