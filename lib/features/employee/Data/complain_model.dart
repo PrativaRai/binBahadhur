@@ -31,7 +31,7 @@ class ComplainModel {
       description: map['description'] ?? '',
       employee: map['employee'] ?? '',
       id: map['_id'] ?? '',
-      userId: map['userId'] ?? null,
+      userId: map['userId'],
     );
   }
 

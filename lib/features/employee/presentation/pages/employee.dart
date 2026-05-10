@@ -1,12 +1,13 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
-import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
-import 'package:binbahadhur/features/employee/presentation/widgets/button.dart';
-import 'package:binbahadhur/features/employee/presentation/widgets/nav_bar.dart';
+import 'package:binbahadhur/core/theme/app_pallete.dart';
+import 'package:binbahadhur/core/widgets/custom_app_bar.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/taskScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/my_tasks_screen.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/complain.dart'; // Ensure this import is correct
 
 class EmployeePage extends StatefulWidget {
   static const String routeName = '/employee';
-
   const EmployeePage({super.key});
 
   @override
@@ -16,45 +17,41 @@ class EmployeePage extends StatefulWidget {
 class _EmployeePageState extends State<EmployeePage> {
   int currentIndex = 0;
 
-  // Function for the Grid Buttons
-  void navigateToComplain(BuildContext context) {
-    Navigator.pushNamed(context, Complain.routeName);
-  }
-
-  final List<NavItem> navItems = [
-    NavItem(label: "Home", icon: Icons.home),
-    NavItem(label: "Complain", icon: Icons.report),
-    NavItem(label: "Tasks", icon: Icons.work),
-    NavItem(label: "Profile", icon: Icons.person),
+  // The pages list determines what is shown in the body based on the navbar index
+  final List<Widget> pages = [
+    const MyTasksScreen(), // Index 0: Home (Available Tasks)
+    const Complain(), // Index 1: Complain Section
+    const Taskscreen(), // Index 2
+    const Center(child: Text("Profile Settings")), // Index 3
   ];
-
-  // Logic for the Bottom Navigation Bar
-  void onNavTapped(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-
-    if (index == 1) {
-      // Index 1 is "Complain" in your navItems list
-      Navigator.pushNamed(context, Complain.routeName);
-    }
-    // Add other navigation logic for Profile or Tasks here
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: 'Employee Dashboard'),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(20),
-        color: Colors.white,
-      ),
-      bottomNavigationBar: BottomNavBar(
+      appBar: const CommonAppBar(title: 'Home'),
+      //body ma dynamically change garxa
+      body: pages[currentIndex],
+
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: onNavTapped, // This now calls the navigation logic
-        items: navItems,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppPallete.blackColor,
+        unselectedItemColor: AppPallete.greyColor,
+        backgroundColor: AppPallete.backgroundColor,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.report_problem),
+            label: "Complain",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: "Tasks"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
       ),
     );
   }

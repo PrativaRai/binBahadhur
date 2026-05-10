@@ -30,7 +30,7 @@ class BottomNavBar extends StatelessWidget {
       selectedItemColor: const Color(0xFF00872D),
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.green,
       // We map the list of NavItem objects into BottomNavigationBarItems
       items: items.map((NavItem item) {
         return BottomNavigationBarItem(

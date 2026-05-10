@@ -47,22 +47,22 @@ class _MyAppState extends State<MyApp> {
       theme: AppTheme.darkThemeMode,
       onGenerateRoute: (settings) => AppRouter.generateRoute(settings),
       //alreaady logged in xa vane afaii login garney
-      // home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
-      home: AdminPage(),
+      home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
+      //home: AdminPage(),
     );
   }
 
   // based on role kaa janey vanerw determine garxa
-  // Widget _getHome(String type) {
-  //   switch (type) {
-  //     case 'admin':
-  //       return const AdminPage();
-  //     case 'employee':
-  //       return const EmployeePage();
-  //     case 'user':
-  //       return const HomePage();
-  //     default:
-  //       return const WelcomePage();
-  //   }
-  // }
+  Widget _getHome(String type) {
+    switch (type) {
+      case 'admin':
+        return const AdminPage();
+      case 'employee':
+        return const EmployeePage();
+      case 'user':
+        return const HomePage();
+      default:
+        return const WelcomePage();
+    }
+  }
 }

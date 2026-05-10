@@ -4,7 +4,7 @@ import 'package:binbahadhur/core/widgets/custom_option.dart';
 import 'package:binbahadhur/features/trash_detection/presentation/pages/camera_page.dart';
 
 class SchedulePage extends StatelessWidget {
-  SchedulePage({super.key, required this.scheduleId});
+  const SchedulePage({super.key, required this.scheduleId});
   final String scheduleId;
 
   @override
