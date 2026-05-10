@@ -7,7 +7,7 @@ const admin = async (req, res, next) => {
     if (!token)
       return res.status(401).json({ msg: "No auth token, access denied" });
 
-    // Use process.env.JWT_SECRET instead of a hardcoded string for security
+
     const verified = jwt.verify(token, "passwordKey"); 
     if (!verified)
       return res

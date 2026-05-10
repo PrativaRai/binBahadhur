@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/constants/utils.dart';
 import 'package:binbahadhur/features/admin/data/admin_services.dart';
 import 'package:binbahadhur/features/employee/Data/complain_model.dart';
@@ -70,18 +71,7 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Employee Reports',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppPallete.whiteColor,
-          ),
-        ),
-        backgroundColor: AppPallete.backgroundColor,
-        elevation: 0,
-        centerTitle: true,
-      ),
+      appBar: CommonAppBar(title: "Employee Reports"),
       backgroundColor: AppPallete.whiteColor,
       body: RefreshIndicator(
         onRefresh: () async => fetchData(),
@@ -92,14 +82,14 @@ class _ReportsPageState extends State<ReportsPage> {
   }
 
   Widget _buildBody() {
-    // State 1: Loading
+    //Loading
     if (complaints == null && !_showNoComplainText) {
       return const Center(
         child: CircularProgressIndicator(color: AppPallete.backgroundColor),
       );
     }
 
-    // State 2: Empty / Timeout
+    //Empty / Timeout
     if (_showNoComplainText || (complaints != null && complaints!.isEmpty)) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -126,7 +116,7 @@ class _ReportsPageState extends State<ReportsPage> {
       );
     }
 
-    // State 3: Show List
+    //Show List
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       itemCount: complaints!.length,
@@ -173,8 +163,7 @@ class _ReportsPageState extends State<ReportsPage> {
                                 ),
                               ),
                               const Icon(
-                                Icons
-                                    .phone_android, // Updated icon to match phone theme
+                                Icons.phone_android,
                                 size: 18,
                                 color: AppPallete.backgroundColor,
                               ),

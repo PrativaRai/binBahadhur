@@ -1,3 +1,4 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/taskDetail.dart';
@@ -33,10 +34,7 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Available Jobs"),
-        backgroundColor: AppPallete.backgroundColor,
-      ),
+      appBar: CommonAppBar(title: "Available Job"),
       backgroundColor: AppPallete.whiteColor,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _tasksFuture,

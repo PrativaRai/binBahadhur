@@ -48,11 +48,11 @@ class _MyAppState extends State<MyApp> {
       onGenerateRoute: (settings) => AppRouter.generateRoute(settings),
       //alreaady logged in xa vane afaii login garney
       home: user.token.isEmpty ? const WelcomePage() : _getHome(user.type),
-      //home: AdminPage(),
+      //home: EmployeePage(),
     );
   }
 
-  // based on role kaa janey vanerw determine garxa
+  //based on role kaa janey vanerw determine garxa
   Widget _getHome(String type) {
     switch (type) {
       case 'admin':

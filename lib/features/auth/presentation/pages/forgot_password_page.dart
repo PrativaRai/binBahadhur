@@ -29,7 +29,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  // 1. Updated to use the WhatsApp Service
   void sendVerificationCode() {
     if (phoneController.text.length == 10) {
       authServices.sendForgotPasswordOtp(
@@ -48,7 +47,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     }
   }
 
-  // 2. Updated to verify OTP and Reset via Node.js
   void handlePasswordUpdate() {
     if (formKey.currentState!.validate()) {
       authServices.resetPassword(

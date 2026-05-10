@@ -5,17 +5,15 @@ const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
 
 // 1. CREATE SCHEDULE
-// Changed: phone is now set to "unassigned" so workers can find it.
-// Added: status is explicitly set to "pending".
-// Added: userId stores req.user so we don't lose track of who created the task.
+
 scheduleRouter.post("/api/schedule", auth, async (req, res) => {
   try {
     const { area, subArea, scheduleType, scheduledDate, scheduledTime } = req.body;
 
     const schedule = new Schedule({
-      userId: req.user,       // Store the actual user ID here
-      phone: "unassigned",    // Set to "unassigned" for the worker dashboard
-      status: "pending",      // Ensure status is pending
+      userId: req.user,      
+      phone: "unassigned",    
+      status: "pending",      
       area,
       subArea,
       scheduleType,
@@ -31,7 +29,7 @@ scheduleRouter.post("/api/schedule", auth, async (req, res) => {
   }
 });
 
-// 2. UPDATE SCHEDULE (Add details/images)
+// 2. UPDATE SCHEDULE
 scheduleRouter.put(
   "/api/schedule/:id",
   auth,
@@ -62,7 +60,7 @@ scheduleRouter.put(
 );
 
 // 3. GET USER'S OWN SCHEDULES
-// Changed: Querying by userId instead of phone
+
 scheduleRouter.get("/api/schedule", auth, async (req, res) => {
   try {
     const schedules = await Schedule.find({ userId: req.user });
@@ -87,30 +85,6 @@ scheduleRouter.get("/api/schedule/:id", auth, async (req, res) => {
   }
 });
 
-// // Inside your CREATE SCHEDULE route
-// scheduleRouter.post("/api/schedule", auth, async (req, res) => {
-//   try {
-//     const { area, subArea, scheduleType, scheduledDate, scheduledTime } = req.body;
-    
-//     // Fetch the logged-in user to get their phone number
-//     const user = await User.findById(req.user);
 
-//     const schedule = new Schedule({
-//       userId: req.user,
-//       phone: user.phone, // Store the actual phone, but it stays hidden via schema
-//       status: "pending",
-//       area,
-//       subArea,
-//       scheduleType,
-//       scheduledDate,
-//       scheduledTime,
-//     });
-
-//     await schedule.save();
-//     res.json({ success: true, msg: "Created", schedule });
-//   } catch (e) {
-//     res.status(500).json({ success: false, error: e.message });
-//   }
-// });
 
 module.exports = scheduleRouter;

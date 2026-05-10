@@ -8,12 +8,7 @@ const scheduleSchema = mongoose.Schema(
        type: String,                      // Points to your User model
       required: true,
     },
-    // NEW: Field to track which employee accepted the task
-    // employeeId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User",
-    //   default: null,
-    // },
+  
     phone: {
       type: String,
       required: [true, "Phone number is required"],

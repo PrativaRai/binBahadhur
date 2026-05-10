@@ -14,13 +14,11 @@ class ManageEmployee extends StatefulWidget {
 }
 
 class _ManageEmployeeState extends State<ManageEmployee> {
-  // CHANGED: Renamed controller from email to phone
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController employeeController = TextEditingController();
   final AdminServices adminServices = AdminServices();
 
-  // Toggle variable: true = Suspend Mode, false = Lift Mode
   bool isSuspendMode = true;
 
   @override
@@ -32,18 +30,16 @@ class _ManageEmployeeState extends State<ManageEmployee> {
   }
 
   void handleAccountStatus() {
-    // CHANGED: Validation check for phone number
     if (phoneController.text.isEmpty) {
       showSnackBar(context, "Please enter a phone number.");
       return;
     }
 
-    // Determine target status based on current mode
     String status = isSuspendMode ? 'suspended' : 'active';
 
     adminServices.updateUserStatus(
       context: context,
-      // CHANGED: Passing phoneNumber instead of email
+
       phoneNumber: phoneController.text,
       status: status,
       onSuccess: () {
@@ -83,13 +79,12 @@ class _ManageEmployeeState extends State<ManageEmployee> {
 
               CustomTextField(
                 controller: phoneController,
-                // CHANGED: Hint text and keyboard type
+
                 hintText: "Enter Phone Number",
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 15),
 
-              // Reason
               if (isSuspendMode)
                 CustomTextField(
                   controller: descriptionController,
@@ -102,7 +97,6 @@ class _ManageEmployeeState extends State<ManageEmployee> {
 
               const SizedBox(height: 30),
 
-              // The Button text changes based on the mode
               CustomButton(
                 text: isSuspendMode ? "Suspend" : "Activate Account",
                 onTap: handleAccountStatus,

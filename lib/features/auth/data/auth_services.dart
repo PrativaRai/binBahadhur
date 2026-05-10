@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthServices {
-  // 1. Send WhatsApp OTP (Signup)
+  //Send WhatsApp OTP (Signup)
   void sendWhatsAppOTP({
     required BuildContext context,
     required String phone,
@@ -35,7 +35,7 @@ class AuthServices {
         context: context,
         onSuccess: () {
           showSnackBar(context, 'OTP sent to your WhatsApp!');
-          onSuccess(); // Triggers the UI change (dialog or state)
+          onSuccess();
         },
       );
     } catch (e) {
@@ -43,7 +43,7 @@ class AuthServices {
     }
   }
 
-  // 2. Final Sign Up
+  //Final Sign Up
   void signUpWithWhatsApp({
     required BuildContext context,
     required String name,
@@ -84,7 +84,7 @@ class AuthServices {
     }
   }
 
-  // 3. Sign In User
+  //Sign In User
   void signInUser({
     required BuildContext context,
     required String phone,
@@ -137,7 +137,7 @@ class AuthServices {
     }
   }
 
-  // 4. Send Forgot Password OTP
+  //Send Forgot Password OTP
   void sendForgotPasswordOtp({
     required BuildContext context,
     required String phone,
@@ -167,7 +167,7 @@ class AuthServices {
     }
   }
 
-  // 5. Reset Password
+  //Reset Password
   void resetPassword({
     required BuildContext context,
     required String phone,
@@ -202,7 +202,7 @@ class AuthServices {
     }
   }
 
-  // 6. Get User Data (Auto-Login)
+  //Get User Data (Auto-Login)
   void getUserData(BuildContext context) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -242,7 +242,7 @@ class AuthServices {
     }
   }
 
-  // 7. Log Out
+  //Log Out
   void logOut(BuildContext context) async {
     try {
       SharedPreferences sharedPreferences =
@@ -270,6 +270,48 @@ class AuthServices {
       );
     } catch (e) {
       showSnackBar(context, e.toString());
+    }
+  }
+
+  //Get Employee Profile Data
+  Future<Map<String, dynamic>?> getEmployeeProfile({
+    required BuildContext context,
+  }) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('x-auth-token');
+
+      // Get the current user ID from the provider
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      String userId = userProvider.user.id;
+
+      if (token == null || token.isEmpty) return null;
+
+      http.Response res = await http.get(
+        Uri.parse('$uri/api/profile/$userId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      // Using your existing error handling logic
+      Map<String, dynamic>? data;
+
+      if (!context.mounted) return null;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          data = jsonDecode(res.body);
+        },
+      );
+
+      return data;
+    } catch (e) {
+      if (context.mounted) showSnackBar(context, "Profile Error: $e");
+      return null;
     }
   }
 }

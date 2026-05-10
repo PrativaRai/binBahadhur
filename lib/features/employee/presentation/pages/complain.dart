@@ -1,3 +1,4 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/employee/Data/complain_services.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/custom_button.dart';
@@ -42,15 +43,7 @@ class _ComplainState extends State<Complain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Complain',
-            style: TextStyle(color: AppPallete.whiteColor),
-          ),
-        ),
-        backgroundColor: AppPallete.backgroundColor,
-      ),
+      appBar: CommonAppBar(title: "Complain"),
       backgroundColor: AppPallete.whiteColor,
       body: Padding(
         padding: const EdgeInsets.all(10.0),

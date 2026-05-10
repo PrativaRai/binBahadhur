@@ -41,11 +41,10 @@ const auth = async (req, res, next) => {
       });
     }
 
-    // IMPORTANT
-    // req.user = phone number
+    
     req.user = user.phone;
 
-    // save actual mongo id separately
+
     req.userId = user._id;
 
     req.token = token;

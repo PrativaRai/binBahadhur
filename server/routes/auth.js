@@ -6,13 +6,13 @@ const jwt = require("jsonwebtoken");
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
-// whatsappclient setup (unchanged)
+// client ly naya whatsapp session create garxa 
 const client = new Client({
     authStrategy: new LocalAuth({
-        dataPath: './.wwebjs_auth' 
+        dataPath: './.wwebjs_auth' //login session store garxa jaily delete garnu push garnu vanda agade
     }),
     puppeteer: {
-        headless: true,
+        headless: true, //browser user laii na tha vae background ma run gare raakhxa
         handleSIGINT: false, 
         args: [
             '--no-sandbox',
@@ -26,7 +26,7 @@ const client = new Client({
 const otpStore = {}; 
 
 client.on('qr', (qr) => {
-    console.log('--- SCAN THIS QR CODE WITH WHATSAPP ---');
+    console.log('SCAN THIS QR CODE To Get OTP IN Whatsapp');
     qrcode.generate(qr, { small: true });
 });
 
@@ -36,9 +36,8 @@ client.on('ready', () => {
 
 client.initialize().catch(err => console.error("WA Init Error:", err));
 
-// --- API Routes ---
 
-// 1. Send OTP
+// Send OTP
 authRouter.post("/api/send-otp", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -56,12 +55,12 @@ authRouter.post("/api/send-otp", async (req, res) => {
     }
 });
 
-// 2. Signup User (CORRECTED)
+// Signup User
 authRouter.post("/api/signup", async (req, res) => {
     try {
-        const { name, phone, password, otp } = req.body;
+        const { name, phone, password, otp,} = req.body;
 
-        // Check OTP
+        
         if (otpStore[phone] !== otp) {
             return res.status(400).json({ msg: "Invalid or expired OTP." });
         }
@@ -71,16 +70,7 @@ authRouter.post("/api/signup", async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ msg: "User with this phone already exists!" });
         }
-
-        /* 
-           REMOVED: The suspension check during signup. 
-           You cannot find a user by "phoneNumber" before they are created. 
-           Suspension logic applies to existing users during Sign-in.
-        */
-
         const hashedPassword = await bcryptjs.hash(password, 8);
-
-        // Use a different variable name (newUser) to avoid redeclaring 'user'
         let newUser = new User({
             name,
             phone,
@@ -97,7 +87,7 @@ authRouter.post("/api/signup", async (req, res) => {
     }
 });
 
-// 3. Sign In (CORRECTED)
+// 3. Sign In
 authRouter.post("/api/signin", async (req, res) => {
     try {
         const { phone, password } = req.body;
@@ -107,7 +97,7 @@ authRouter.post("/api/signin", async (req, res) => {
             return res.status(400).json({ msg: "User with this phone number does not exist!" });
         }
 
-        // Check suspension
+        
         if (user.status === 'suspended') {
             return res.status(403).json({ msg: "Your account has been suspended. Please contact admin." });
         }
@@ -117,14 +107,14 @@ authRouter.post("/api/signin", async (req, res) => {
             return res.status(400).json({ msg: "Incorrect password." });
         }
 
-        const token = jwt.sign({ id: user._id }, "passwordKey");
+        const token = jwt.sign({ id: user._id, type: user.type}, "passwordKey");
         res.json({ token, ...user._doc });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
 });
 
-// 4. Forgot Password (unchanged)
+// 4. Forgot Password
 authRouter.post("/api/forgot-password", async (req, res) => {
     try {
         const { phone } = req.body;
@@ -143,7 +133,7 @@ authRouter.post("/api/forgot-password", async (req, res) => {
     }
 });
 
-// 5. Reset Password (unchanged)
+// 5. Reset Password
 authRouter.post("/api/reset-password", async (req, res) => {
     try {
         const { phone, otp, newPassword } = req.body;

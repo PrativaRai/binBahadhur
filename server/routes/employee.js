@@ -7,11 +7,10 @@ const auth = require("../middleware/auth");
 const employeeMiddleware = require("../middleware/employee");
 
 // 1. GET ALL AVAILABLE (UNASSIGNED) TASKS
-// Hides phone numbers from the general list
+
 employeeRouter.get("/api/worker/available-tasks", auth, employeeMiddleware, async (req, res) => {
   try {
-    // Only fetch tasks that are 'pending'
-    // Do NOT select phone or populate phone here
+   
     const tasks = await Schedule.find({ status: "pending" })
       .populate("userId", "name") 
       .sort({ createdAt: -1 });
@@ -27,7 +26,7 @@ employeeRouter.get("/api/worker/available-tasks", auth, employeeMiddleware, asyn
 });
 
 // 2. ACCEPT A TASK
-// Reveals the phone number only at the moment of acceptance
+
 employeeRouter.patch("/api/worker/accept-task/:taskId", auth, employeeMiddleware, async (req, res) => {
   try {
     const taskId = req.params.taskId;
@@ -42,25 +41,23 @@ employeeRouter.patch("/api/worker/accept-task/:taskId", auth, employeeMiddleware
     if (!task) {
       return res.status(404).json({ success: false, error: "Task not found" });
     }
-    
-    // Check status instead of the phone string
+  
     if (task.status !== "pending") {
       return res.status(400).json({ success: false, error: "Task already assigned or completed" });
     }
 
-    // Assign employee and update status
+  
     task.status = "assigned";
-    // We store the employee's phone here so we know who is doing the job
+    
     task.phone = employee.phone; 
     await task.save();
 
-    // Now reveal the creator's phone number using '+phone' 
-    // This override is necessary because of 'select: false' in the Schema
+    
     const revealedTask = await Schedule.findById(taskId).populate({
       path: 'userId',
       select: 'name +phone' 
     });
-    // Check if the populate actually worked
+   
 if (!revealedTask.userId) {
     return res.status(500).json({ success: false, error: "User data not found" });
 }
@@ -82,18 +79,17 @@ if (!revealedTask.userId) {
 });
 
 // 3. GET ASSIGNED TASKS (MY TASKS)
-// Re-shows phone numbers for tasks the employee owns
 employeeRouter.get("/api/worker/my-tasks", auth, employeeMiddleware, async (req, res) => {
   try {
     const employee = await User.findById(req.userId);
     
-    // Find tasks assigned to this employee's phone number
+    
     const tasks = await Schedule.find({
       phone: employee.phone,
       status: "assigned"
     }).populate({
       path: 'userId',
-      select: 'name +phone' // Must explicitly ask for phone here too
+      select: 'name +phone' 
     }).sort({ createdAt: -1 });
 
     res.json({ success: true, count: tasks.length, tasks });
@@ -125,6 +121,50 @@ employeeRouter.post('/api/worker/add-complain', auth, employeeMiddleware, async 
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });
   }
+});
+
+// GET /api/profile/:id
+employeeRouter.get("/api/profile/:id", async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const userId = req.params.id;
+
+        const profileData = await User.aggregate([
+            
+            { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+            
+            {
+                $lookup: {
+                   from: "schedules",        
+                    localField: "phone",      
+                    foreignField: "phone",    
+                    as: "allTasks"
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    phone: 1,
+                    role: "$type",
+                    profilePic: 1,
+                    tasksTaken: { $size: "$allTasks" },
+                    tasksCompleted: {
+                        $size: {
+                            $filter: {
+                                input: "$allTasks",
+                                as: "t",
+                                cond: { $eq: ["$$t.status", "completed"] }
+                            }
+                        }
+                    }
+                }
+            }
+        ]);
+
+        res.json(profileData[0]);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 module.exports = employeeRouter;

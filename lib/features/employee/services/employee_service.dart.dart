@@ -4,13 +4,11 @@ import 'package:http/http.dart' as http;
 class EmployeeService {
   final String baseUrl = 'http://10.0.2.2:3000';
 
-  // Helper: handle response safely
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final decoded = json.decode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return decoded;
     } else {
-      // Return error structure instead of throwing
       return {
         'success': false,
         'error': decoded['error'] ?? 'Server error: ${response.statusCode}',
@@ -19,7 +17,7 @@ class EmployeeService {
     }
   }
 
-  // 1. Fetch available tasks
+  // Fetch available tasks
   Future<Map<String, dynamic>> fetchAvailableTasks(String token) async {
     try {
       final response = await http.get(
@@ -32,7 +30,7 @@ class EmployeeService {
     }
   }
 
-  // 2. Accept task
+  //Accept task
   Future<Map<String, dynamic>> acceptTask(String taskId, String token) async {
     try {
       final response = await http.patch(
@@ -45,7 +43,7 @@ class EmployeeService {
     }
   }
 
-  // 3. Fetch My Tasks
+  //Fetch My Tasks
   Future<Map<String, dynamic>> fetchMyTasks(String token) async {
     try {
       final response = await http.get(
@@ -58,7 +56,7 @@ class EmployeeService {
     }
   }
 
-  // 4. Add Complaint
+  //Add Complaint
   Future<Map<String, dynamic>> addComplain({
     required String token,
     required String phoneNumber,
@@ -79,15 +77,13 @@ class EmployeeService {
     }
   }
 
-  // 5. ✅ NEW: Create schedule – FIXES the ObjectId error
   Future<Map<String, dynamic>> createSchedule({
     required String token,
-    required String userId, // MUST be the 24-char ObjectId, not phone number
+    required String userId,
     required DateTime scheduleDate,
     required String description,
   }) async {
     try {
-      // Validate userId format (basic check)
       if (!RegExp(r'^[a-fA-F0-9]{24}$').hasMatch(userId)) {
         return {
           'success': false,
@@ -100,7 +96,7 @@ class EmployeeService {
         Uri.parse("$baseUrl/api/schedule/create"),
         headers: {'Content-Type': 'application/json', 'x-auth-token': token},
         body: json.encode({
-          'userId': userId, // now sends correct ObjectId
+          'userId': userId,
           'date': scheduleDate.toIso8601String(),
           'description': description,
         }),

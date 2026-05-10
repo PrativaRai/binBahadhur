@@ -40,7 +40,8 @@ phone: {
         type: String,
         default: "active"
     },
-}, { timestamps: true }); // Good practice to track when users joined
+    profilePic: { type: String, default: "" },
+}, { timestamps: true }); 
 
 
 

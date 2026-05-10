@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class AdminServices {
-  // 1. FETCH ALL COMPLAINTS
+  //FETCH ALL COMPLAINTS
   Future<List<ComplainModel>> fetchAllComplain(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     List<ComplainModel> complainList = [];
@@ -42,7 +42,7 @@ class AdminServices {
     return complainList;
   }
 
-  // 2. DELETE / RESOLVE COMPLAINT
+  //DELETE / RESOLVE COMPLAINT
   void deleteComplain({
     required BuildContext context,
     required ComplainModel complain,
@@ -69,10 +69,10 @@ class AdminServices {
     }
   }
 
-  // 3. UPDATE USER STATUS (SUSPEND/BLOCK)
+  //UPDATE USER STATUS
   void updateUserStatus({
     required BuildContext context,
-    required String phoneNumber, // CHANGED: parameter name
+    required String phoneNumber,
     required String status,
     required VoidCallback onSuccess,
   }) async {

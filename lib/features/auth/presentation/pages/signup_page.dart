@@ -29,20 +29,18 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  // 1. Trigger the Node.js WhatsApp OTP
+  //Trigger the Node.js WhatsApp OTP
   void startWhatsappSignupFlow() {
-    // Note: Make sure to create 'sendWhatsAppOTP' in your auth_services.dart
     authservices.sendWhatsAppOTP(
       context: context,
       phone: phoneController.text,
       onSuccess: () {
-        // Show the dialog once the backend confirms WhatsApp message sent
         showOtpDialog();
       },
     );
   }
 
-  // 2. The Pop-up UI for WhatsApp OTP
+  //UI for WhatsApp OTP
   void showOtpDialog() {
     showDialog(
       context: context,

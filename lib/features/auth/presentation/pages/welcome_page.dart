@@ -106,7 +106,7 @@ class _WelcomePageState extends State<WelcomePage> {
             ),
           ),
 
-          /// Sliding Auth Container (Login/Signup)
+          /// Sliding Auth Container
           AnimatedPositioned(
             duration: const Duration(seconds: 1),
             curve: Curves.easeInOut,

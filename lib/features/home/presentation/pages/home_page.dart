@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
     final String date = DateFormat('EEEE, d MMM').format(DateTime.now());
 
     return Scaffold(
-      appBar: const CommonAppBar(title: 'Home'),
+      appBar: const CommonAppBar(title: "Home"),
       body: Column(
         children: [
           Container(

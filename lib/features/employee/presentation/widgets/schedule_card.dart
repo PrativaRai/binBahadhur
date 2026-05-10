@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-// import '../da'; // Ensure this path matches your file structure
 
 class ScheduleCard extends StatelessWidget {
-  final dynamic task; // Using dynamic to match your current list map
+  final dynamic task;
   final String buttonText;
   final VoidCallback onBtnPressed;
 

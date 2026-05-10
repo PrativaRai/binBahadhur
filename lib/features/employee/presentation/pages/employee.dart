@@ -1,7 +1,9 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/core/widgets/custom_app_bar.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/profileScreen.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/taskScreen.dart';
+import 'package:binbahadhur/features/employee/presentation/widgets/customprofile.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/my_tasks_screen.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart'; // Ensure this import is correct
@@ -17,18 +19,16 @@ class EmployeePage extends StatefulWidget {
 class _EmployeePageState extends State<EmployeePage> {
   int currentIndex = 0;
 
-  // The pages list determines what is shown in the body based on the navbar index
   final List<Widget> pages = [
-    const MyTasksScreen(), // Index 0: Home (Available Tasks)
-    const Complain(), // Index 1: Complain Section
-    const Taskscreen(), // Index 2
-    const Center(child: Text("Profile Settings")), // Index 3
+    const MyTasksScreen(),
+    const Complain(),
+    const Taskscreen(),
+    const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: 'Home'),
       //body ma dynamically change garxa
       body: pages[currentIndex],
 

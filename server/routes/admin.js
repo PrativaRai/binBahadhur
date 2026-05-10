@@ -4,7 +4,7 @@ const Complain = require("../models/complain");
 const User = require("../models/user"); 
 const adminMiddleware = require("../middleware/admin");
 
-// 1. GET ALL COMPLAINTS
+//GET ALL COMPLAINTS
 adminRouter.get('/admin/get-complain', adminMiddleware, async (req, res) => {
     try {
         const complain = await Complain.find({});
@@ -14,7 +14,7 @@ adminRouter.get('/admin/get-complain', adminMiddleware, async (req, res) => {
     }
 });
 
-// 2. RESOLVE / DELETE COMPLAINT
+//RESOLVE / DELETE COMPLAINT
 adminRouter.post('/admin/delete-complain', adminMiddleware, async (req, res) => {
     try {
         const { id } = req.body;
@@ -25,13 +25,13 @@ adminRouter.post('/admin/delete-complain', adminMiddleware, async (req, res) => 
     }
 });
 
-// 3. UPDATE USER STATUS (SUSPEND/ACTIVATE)
+// UPDATE USER STATUS (SUSPEND/ACTIVATE)
 adminRouter.post("/admin/update-user-status", adminMiddleware, async (req, res) => {
     try {
-        // CHANGED: Receiving phoneNumber instead of email from the request body
+        
         const { phoneNumber, targetStatus } = req.body;
 
-        // CHANGED: Finding user by phoneNumber
+        
         const user = await User.findOneAndUpdate(
             { phoneNumber: phoneNumber }, 
             { status: targetStatus },
@@ -39,7 +39,7 @@ adminRouter.post("/admin/update-user-status", adminMiddleware, async (req, res) 
         );
 
         if (!user) {
-            // CHANGED: Updated error message for clarity
+           
             return res.status(400).json({ msg: "User with this phone number not found!" });
         }
 
@@ -49,4 +49,24 @@ adminRouter.post("/admin/update-user-status", adminMiddleware, async (req, res) 
     }
 });
 
+//profile admin
+adminRouter.get("/api/profile/:id", adminMiddleware, async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        
+        if (!user) {
+            return res.status(404).json({ error: "Admin profile not found" });
+        }
+
+        
+        res.json({
+            name: user.name,
+            phone: user.phone,
+            role: user.type, 
+            profilePic: user.profilePic || "",
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 module.exports = adminRouter;

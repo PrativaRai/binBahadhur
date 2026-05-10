@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // 1. DATA MODEL
-// This allows you to define what each tab looks like outside of the UI code.
 class NavItem {
   final String label;
   final IconData icon;
@@ -13,7 +12,7 @@ class NavItem {
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
-  final List<NavItem> items; // This makes it dynamic
+  final List<NavItem> items;
 
   const BottomNavBar({
     super.key,
@@ -31,7 +30,7 @@ class BottomNavBar extends StatelessWidget {
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
       backgroundColor: Colors.green,
-      // We map the list of NavItem objects into BottomNavigationBarItems
+
       items: items.map((NavItem item) {
         return BottomNavigationBarItem(
           icon: Icon(item.icon),

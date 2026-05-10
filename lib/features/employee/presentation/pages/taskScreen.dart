@@ -1,3 +1,4 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/taskDetail.dart';
@@ -24,10 +25,7 @@ class _TaskscreenState extends State<Taskscreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("My Assigned Tasks"),
-        backgroundColor: AppPallete.backgroundColor,
-      ),
+      appBar: CommonAppBar(title: "Accepted Task"),
       backgroundColor: AppPallete.whiteColor,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _service.fetchMyTasks(token),
@@ -59,15 +57,27 @@ class _TaskscreenState extends State<Taskscreen> {
             itemBuilder: (context, index) {
               final task = tasks[index];
               return Card(
+                color: AppPallete.whiteColor,
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 elevation: 2,
                 child: ListTile(
-                  leading: const Icon(Icons.work, color: Colors.green),
-                  title: Text("${task['area']} - ${task['subArea']}"),
+                  leading: const Icon(
+                    Icons.work,
+                    color: AppPallete.backgroundColor,
+                  ),
+                  title: Text(
+                    "${task['area']} - ${task['subArea']}",
+                    style: TextStyle(color: AppPallete.blackColor),
+                  ),
                   subtitle: Text(
                     "Type: ${task['scheduleType']} | Status: ${task['status']}",
+                    style: TextStyle(color: AppPallete.blackColor),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: AppPallete.backgroundColor,
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,

@@ -1,7 +1,8 @@
-import 'package:binbahadhur/core/constants/common_appbar.dart';
+import 'package:binbahadhur/core/theme/app_pallete.dart';
+import 'package:binbahadhur/features/admin/presentation/pages/adminPrrofilePage.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/manage_employee.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/reports_pages.dart';
-import 'package:binbahadhur/features/employee/presentation/widgets/nav_bar.dart'; // Ensure this path is correct
+
 import 'package:flutter/material.dart';
 
 class AdminPage extends StatefulWidget {
@@ -15,54 +16,42 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   int currentIndex = 0;
 
-  // Grid Navigation Logic
-  void navigateToReports(BuildContext context) {
-    Navigator.pushNamed(context, ReportsPage.routeName);
-  }
-
-  void navigateToManageEmployee(BuildContext context) {
-    Navigator.pushNamed(context, ManageEmployee.routeName);
-  }
-
-  // Dynamic Navbar Items
-  final List<NavItem> navItems = [
-    NavItem(label: "Home", icon: Icons.home),
-    NavItem(label: "Reports", icon: Icons.assignment_late),
-    NavItem(label: "Suspend", icon: Icons.manage_accounts),
-    NavItem(label: "Profile", icon: Icons.person),
+  final List<Widget> pages = [
+    const Center(child: Text("Admin Dashboard / Home")),
+    const ReportsPage(),
+    const ManageEmployee(),
+    const AdminProfilePage(),
   ];
-
-  // Navbar Navigation Logic
-  void onNavTapped(int index) {
-    setState(() {
-      currentIndex = index;
-    });
-
-    // Link navbar items to pages
-    if (index == 1) {
-      Navigator.pushNamed(context, ReportsPage.routeName);
-    } else if (index == 2) {
-      Navigator.pushNamed(context, ManageEmployee.routeName);
-    } else if (index == 3) {
-      // TODO: Navigate to Admin Profile if you have one
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(title: 'Admin Dashboard'),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(20),
-        color: Colors.white,
-      ),
-      // Apply the same BottomNavBar here
-      bottomNavigationBar: BottomNavBar(
+      backgroundColor: AppPallete.whiteColor,
+      body: IndexedStack(index: currentIndex, children: pages),
+
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: onNavTapped,
-        items: navItems,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: AppPallete.blackColor,
+        unselectedItemColor: AppPallete.greyColor,
+        backgroundColor: AppPallete.backgroundColor,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_late),
+            label: "Reports",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.manage_accounts),
+            label: "Manage",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
       ),
     );
   }
