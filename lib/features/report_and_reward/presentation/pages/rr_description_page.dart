@@ -7,6 +7,7 @@ import 'package:binbahadhur/features/report_and_reward/data/report_service.dart'
 import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_confirmation_page.dart';
 
 class RRSaveDetailsPage extends StatefulWidget {
+  //eta reportid pass garera ani tei id mai aru details thapna lai
   final File imageFile;
   final String reportId;
 
