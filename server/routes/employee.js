@@ -87,7 +87,7 @@ employeeRouter.get("/api/worker/my-tasks", auth, employeeMiddleware, async (req,
     
     const tasks = await Schedule.find({
       phone: employee.phone,
-      status: "assigned"
+      status: { $in: ["assigned", "started", "in-progress"] }
     }).populate({
       path: 'userId',
       select: 'name +phone' 
@@ -166,6 +166,36 @@ employeeRouter.get("/api/profile/:id", async (req, res) => {
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
+});
+
+
+
+// 6. COMPLETE A TASK
+employeeRouter.post("/api/worker/complete-task", auth, employeeMiddleware, async (req, res) => {
+  try {
+    const { taskId, weightCollected, moneyPaid } = req.body;
+
+    const task = await Schedule.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ success: false, error: "Task not found" });
+    }
+
+    // Update task details
+    task.status = "completed";
+    task.weightCollected = weightCollected; // Ensure these fields exist in your Schedule model
+    task.moneyPaid = moneyPaid;
+    task.completedAt = Date.now();
+
+    await task.save();
+
+    res.json({
+      success: true,
+      message: "Task completed successfully",
+      task
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
 
 module.exports = employeeRouter;

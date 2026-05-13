@@ -18,7 +18,7 @@ class _TaskscreenState extends State<Taskscreen> {
 
   @override
   Widget build(BuildContext context) {
-    final token = context.read<UserProvider>().user?.token;
+    final token = context.read<UserProvider>().user.token;
 
     if (token == null || token.isEmpty) {
       return const Scaffold(body: Center(child: Text("Not authenticated")));

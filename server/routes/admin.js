@@ -2,6 +2,7 @@ const express = require('express');
 const adminRouter = express.Router();
 const Complain = require("../models/complain");
 const User = require("../models/user"); 
+const Schedule = require("../models/schedule");
 const adminMiddleware = require("../middleware/admin");
 
 //GET ALL COMPLAINTS
@@ -65,6 +66,21 @@ adminRouter.get("/api/profile/:id", adminMiddleware, async (req, res) => {
             role: user.type, 
             profilePic: user.profilePic || "",
         });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+//get notification
+adminRouter.get("/admin/track-tasks", adminMiddleware, async (req, res) => {
+    try {
+        // Find all schedules and populate both Customer and Employee details
+        const tasks = await Schedule.find()
+            .populate("userId", "name phone")    // Populate Customer info
+            .populate("assignedTo", "name phone") // Populate Employee info
+            .sort({ updatedAt: -1 });
+
+        res.json({ success: true, tasks: tasks || [] });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }

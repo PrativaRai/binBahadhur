@@ -3,6 +3,7 @@ import 'package:binbahadhur/features/admin/presentation/pages/manage_employee.da
 import 'package:binbahadhur/features/admin/presentation/pages/reports_pages.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/employee.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/my_tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
 import 'package:binbahadhur/features/auth/presentation/pages/welcome_page.dart';
@@ -35,6 +36,13 @@ class AppRouter {
         return MaterialPageRoute(
           settings: routeSettings,
           builder: (_) => const EmployeePage(),
+        );
+
+      //mytaskscreen
+      case MyTasksScreen.routeName:
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const MyTasksScreen(),
         );
 
       //welcome

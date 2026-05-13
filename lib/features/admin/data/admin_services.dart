@@ -1,15 +1,18 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+
+// Internal imports - verify these match your project structure
 import 'package:binbahadhur/core/constants/global_variable.dart';
 import 'package:binbahadhur/core/constants/utils.dart';
 import 'package:binbahadhur/core/error/error_handling.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/Data/complain_model.dart';
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 
 class AdminServices {
   // 1. FETCH ALL COMPLAINTS
+  // Fetches the list of complaints and maps them to the ComplainModel
   Future<List<ComplainModel>> fetchAllComplain(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     List<ComplainModel> complainList = [];
@@ -60,7 +63,6 @@ class AdminServices {
           'Content-Type': 'application/json; charset=UTF-8',
           'x-auth-token': userProvider.user.token,
         },
-
         body: jsonEncode({'id': complain.id}),
       );
 
@@ -73,7 +75,7 @@ class AdminServices {
     }
   }
 
-  // 3. UPDATE USER STATUS
+  // 3. UPDATE USER STATUS (SUSPEND/ACTIVATE)
   void updateUserStatus({
     required BuildContext context,
     required String phoneNumber,
@@ -97,6 +99,38 @@ class AdminServices {
       if (context.mounted) {
         showSnackBar(context, e.toString());
       }
+    }
+  }
+
+  // 4. FETCH ALL TASKS (LIVE TRACKING)
+  // Used by the Tracking Panel to see customers and assigned employees
+  Future<Map<String, dynamic>> fetchAllTasks(String token) async {
+    try {
+      http.Response res = await http.get(
+        Uri.parse('$uri/admin/track-tasks'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      final Map<String, dynamic> responseData = jsonDecode(res.body);
+
+      if (res.statusCode == 200 && responseData['success'] == true) {
+        return responseData;
+      } else {
+        return {
+          'success': false,
+          'tasks': [],
+          'error': responseData['error'] ?? 'Failed to fetch tracking data',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'tasks': [],
+        'error': 'Network connection error: ${e.toString()}',
+      };
     }
   }
 }

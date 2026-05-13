@@ -1,5 +1,6 @@
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/adminPrrofilePage.dart';
+import 'package:binbahadhur/features/admin/presentation/pages/adminTrackingScreen.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/manage_employee.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/reports_pages.dart';
 
@@ -17,7 +18,7 @@ class _AdminPageState extends State<AdminPage> {
   int currentIndex = 0;
 
   final List<Widget> pages = [
-    const Center(child: Text("Admin Dashboard / Home")),
+    const AdminTrackingScreen(),
     const ReportsPage(),
     const ManageEmployee(),
     const AdminProfilePage(),

@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 class MyTasksScreen extends StatefulWidget {
   const MyTasksScreen({super.key});
+  static const String routeName = '/mytaskscreen';
 
   @override
   State<MyTasksScreen> createState() => _MyTasksScreenState();
@@ -16,18 +17,21 @@ class MyTasksScreen extends StatefulWidget {
 class _MyTasksScreenState extends State<MyTasksScreen> {
   final EmployeeService _service = EmployeeService();
   Future<Map<String, dynamic>>? _tasksFuture;
+  void _loadTasks() {
+    final token = Provider.of<UserProvider>(context, listen: false).user.token;
+    if (token != null) {
+      setState(() {
+        // NOTE: Ensure your service/backend now returns both 'pending' and 'started'
+        _tasksFuture = _service.fetchAvailableTasks(token);
+      });
+    }
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (_tasksFuture == null) {
-      final token = Provider.of<UserProvider>(
-        context,
-        listen: false,
-      ).user?.token;
-      if (token != null) {
-        _tasksFuture = _service.fetchAvailableTasks(token);
-      }
+      _loadTasks();
     }
   }
 
@@ -93,13 +97,14 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
                     Icons.chevron_right,
                     color: AppPallete.backgroundColor,
                   ),
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => TaskDetailScreen(task: task),
                       ),
                     );
+                    _loadTasks();
                   },
                 ),
               );

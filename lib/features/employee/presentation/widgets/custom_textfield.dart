@@ -17,6 +17,7 @@ class CustomTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      style: const TextStyle(color: AppPallete.blackColor),
       controller: controller,
       decoration: InputDecoration(
         hintText: hintText,

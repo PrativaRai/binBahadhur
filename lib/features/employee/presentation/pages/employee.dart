@@ -1,9 +1,8 @@
-import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
-import 'package:binbahadhur/core/widgets/custom_app_bar.dart';
+
 import 'package:binbahadhur/features/employee/presentation/pages/profileScreen.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/taskScreen.dart';
-import 'package:binbahadhur/features/employee/presentation/widgets/customprofile.dart';
+
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/my_tasks_screen.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart'; // Ensure this import is correct

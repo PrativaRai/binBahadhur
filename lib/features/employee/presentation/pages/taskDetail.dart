@@ -2,9 +2,10 @@ import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/complain.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/contactInfoScreen.dart';
 import 'package:binbahadhur/features/employee/services/employee_service.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // for date formatting
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class TaskDetailScreen extends StatefulWidget {
@@ -23,9 +24,8 @@ class TaskDetailScreen extends StatefulWidget {
 
 class _TaskDetailScreenState extends State<TaskDetailScreen> {
   final EmployeeService _service = EmployeeService();
-  bool _isAccepting = false;
+  bool _isLoading = false;
 
-  // Helper to format date
   String _formatDate(dynamic dateValue) {
     if (dateValue == null) return 'Not scheduled';
     try {
@@ -36,77 +36,63 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
+  // --- LOGIC: START TASK & NAVIGATE ---
+  Future<void> _handleStartTask() async {
+    final token = context.read<UserProvider>().user.token;
+    setState(() => _isLoading = true);
+
+    try {
+      // Pass the ID from widget.task
+      final response = await _service.startTask(widget.task['_id'], token!);
+
+      if (response['success'] == true) {
+        final rawProfile = response['task']['userId'];
+
+        if (mounted) {
+          if (rawProfile is Map<String, dynamic>) {
+            // Navigate to Contact Info Page with the correct ID
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ContactInfoScreen(
+                  profile: rawProfile,
+                  taskId: widget.task['_id'], // Fixed: Accessing via widget
+                ),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Task started, but contact info unavailable."),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  //LOGIC: ACCEPT TASK
   Future<void> _handleAcceptAction(String token) async {
-    setState(() => _isAccepting = true);
+    setState(() => _isLoading = true);
     try {
       final response = await _service.acceptTask(widget.task['_id'], token);
-      if (response['success'] == true && mounted) {
-        /*
-        final String creatorPhone =
-            response['task']['creatorPhone']?.toString() ?? 'N/A';
-        final String creatorName =
-            response['task']['creatorName']?.toString() ?? 'User';
-
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            title: const Text("Task Accepted"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("You have accepted the task from $creatorName."),
-                const SizedBox(height: 12),
-                const Text("Contact the requester at:"),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppPallete.whiteColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.phone,
-                        color: AppPallete.backgroundColor,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        creatorPhone,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context, true);
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          ),
-        );
-*/
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("You have accepted this task"),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-        await Future.delayed(const Duration(milliseconds: 1500));
+      if (response['success'] == true) {
         if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Task accepted!"),
+              backgroundColor: AppPallete.whiteColor,
+            ),
+          );
           Navigator.pop(context, true);
         }
       } else {
@@ -122,105 +108,57 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         );
       }
     } finally {
-      if (mounted) setState(() => _isAccepting = false);
+      if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  // Placeholder for Start action
-  void _handleStartTask() {
-    // TODO: Implement start task logic (e.g., update status to 'in-progress')
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Start task clicked - implement API call"),
-        backgroundColor: Colors.orange,
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final token = context.read<UserProvider>().user?.token;
+    final token = context.read<UserProvider>().user.token;
 
-    // Check if phone exists in the initial task data
     String? existingPhone;
     if (widget.task['userId'] != null && widget.task['userId'] is Map) {
       existingPhone = widget.task['userId']['phone'];
     }
 
     return Scaffold(
-      appBar: CommonAppBar(title: "Task Details"),
+      appBar: const CommonAppBar(title: "Task Details"),
       backgroundColor: AppPallete.whiteColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(),
             const SizedBox(height: 24),
-
-            // Schedule Type
             _buildInfoCard(
               title: "Schedule Type",
               icon: Icons.calendar_today,
               content: widget.task['scheduleType'] ?? 'N/A',
             ),
-            const SizedBox(height: 12),
-
-            // Scheduled Date & Time
-            if (widget.task['scheduledDate'] != null ||
-                widget.task['scheduledTime'] != null)
-              _buildInfoCard(
-                title: "Schedule Date & Time",
-                icon: Icons.date_range,
-                content:
-                    "${_formatDate(widget.task['scheduledDate'])} ${widget.task['scheduledTime'] ?? ''}"
-                        .trim(),
-              ),
-            const SizedBox(height: 12),
-
-            // Location
+            _buildInfoCard(
+              title: "Date & Time",
+              icon: Icons.date_range,
+              content:
+                  "${_formatDate(widget.task['scheduledDate'])} ${widget.task['scheduledTime'] ?? ''}",
+            ),
             _buildInfoCard(
               title: "Location",
               icon: Icons.location_on,
               content:
-                  "Area: ${widget.task['area'] ?? 'N/A'}\nSub‑Area: ${widget.task['subArea'] ?? 'N/A'}",
+                  "Area: ${widget.task['area']}\nSub-Area: ${widget.task['subArea']}",
             ),
-            const SizedBox(height: 12),
-
-            // Waste Type
             _buildInfoCard(
               title: "Waste Type",
               icon: Icons.delete_outline,
               content: widget.task['wasteType'] ?? 'Not specified',
             ),
-            const SizedBox(height: 12),
-
-            // Price per Kg
             if (widget.task['pricePerKg'] != null)
               _buildInfoCard(
                 title: "Price per Kg",
                 icon: Icons.attach_money,
-                content: "₹ ${widget.task['pricePerKg']}",
+                content: "Rs. ${widget.task['pricePerKg']}",
               ),
-            const SizedBox(height: 12),
-
-            // Description
-            if (widget.task['description'] != null &&
-                widget.task['description'].toString().isNotEmpty)
-              _buildInfoCard(
-                title: "Description",
-                icon: Icons.description,
-                content: widget.task['description'],
-              ),
-            const SizedBox(height: 12),
-
-            _buildInfoCard(
-              title: "Task Id",
-              icon: Icons.description,
-              content: widget.task['_id'] ?? "Unknown",
-            ),
-            // Requester Phone (if available)
-            if (existingPhone != null && existingPhone.isNotEmpty)
+            if (existingPhone != null)
               _buildInfoCard(
                 title: "Requester Phone",
                 icon: Icons.phone,
@@ -229,7 +167,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
             const SizedBox(height: 30),
 
-            //ACCEPT for available tasks, START + REPORT for assigned tasks
+            // BOTTOM ACTION BUTTONS
             if (!widget.isReadOnly)
               SizedBox(
                 width: double.infinity,
@@ -237,27 +175,25 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppPallete.backgroundColor,
-                    foregroundColor: AppPallete.whiteColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: token == null || _isAccepting
+                  onPressed: _isLoading
                       ? null
                       : () => _handleAcceptAction(token),
-                  child: _isAccepting
+                  child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
                           "ACCEPT",
                           style: TextStyle(
-                            fontSize: 16,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                 ),
-              ),
-
-            if (widget.isReadOnly)
+              )
+            else
               Row(
                 children: [
                   Expanded(
@@ -266,19 +202,22 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: _handleStartTask,
-                        child: const Text(
-                          "START",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        onPressed: _isLoading ? null : _handleStartTask,
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "START",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -289,18 +228,16 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, Complain.routeName);
-                        },
+                        onPressed: () =>
+                            Navigator.pushNamed(context, Complain.routeName),
                         child: const Text(
                           "REPORT",
                           style: TextStyle(
-                            fontSize: 16,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -337,7 +274,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           ),
           Text(
             widget.task['subArea'] ?? '',
-            style: TextStyle(fontSize: 18, color: AppPallete.blackColor),
+            style: const TextStyle(fontSize: 18, color: AppPallete.blackColor),
           ),
         ],
       ),
@@ -368,9 +305,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               Text(
                 title,
                 style: const TextStyle(
-                  color: AppPallete.blackColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
+                  color: AppPallete.blackColor,
                 ),
               ),
             ],

@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const scheduleSchema = mongoose.Schema(
   {
     userId: {
-      // type: mongoose.Schema.Types.ObjectId, // Keep this as ObjectId for .populate()
-      // ref: "User",    
-       type: String,                      // Points to your User model
+      type: mongoose.Schema.Types.ObjectId, // Keep this as ObjectId for .populate()
+     ref: "User",    
+                          
       required: true,
     },
   
@@ -13,8 +13,14 @@ const scheduleSchema = mongoose.Schema(
       type: String,
       required: [true, "Phone number is required"],
       trim: true,
-      select: false, // Hidden until accepted
+ 
     },
+
+    assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User", 
+    default: null,
+  },
     area: {
       type: String,
       required: true,
@@ -38,7 +44,8 @@ const scheduleSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending", // pending, assigned, completed
+      default: "pending", 
+      enum: ["pending", "accepted", "started", "completed", "cancelled"],
     },
     wasteType: {
       type: String,
