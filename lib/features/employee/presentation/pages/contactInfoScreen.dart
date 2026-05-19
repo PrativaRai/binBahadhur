@@ -55,7 +55,7 @@ class _ContactInfoScreenState extends State<ContactInfoScreen> {
         taskId: widget.taskId,
         weight: weight,
         money: money,
-        token: userProvider.user.token!,
+        token: userProvider.user.token,
       );
 
       if (result['success'] == true) {

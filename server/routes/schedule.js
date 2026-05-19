@@ -4,11 +4,11 @@ const Schedule = require("../models/schedule");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
 
-// 1. CREATE SCHEDULE
+//CREATE SCHEDULE
 
 scheduleRouter.post("/api/schedule", auth, async (req, res) => {
   try {
-    const { area, subArea, scheduleType, scheduledDate, scheduledTime } = req.body;
+    const { area, subArea, scheduleType, scheduledDate, scheduledTime, description } = req.body;
 
     const schedule = new Schedule({
       userId: req.userId,     
@@ -19,6 +19,7 @@ scheduleRouter.post("/api/schedule", auth, async (req, res) => {
       scheduleType,
       scheduledDate,
       scheduledTime,
+      description,
     });
 
     await schedule.save();

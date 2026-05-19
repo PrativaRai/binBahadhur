@@ -19,12 +19,10 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
   Future<Map<String, dynamic>>? _tasksFuture;
   void _loadTasks() {
     final token = Provider.of<UserProvider>(context, listen: false).user.token;
-    if (token != null) {
-      setState(() {
-        // NOTE: Ensure your service/backend now returns both 'pending' and 'started'
-        _tasksFuture = _service.fetchAvailableTasks(token);
-      });
-    }
+    setState(() {
+      // NOTE: Ensure your service/backend now returns both 'pending' and 'started'
+      _tasksFuture = _service.fetchAvailableTasks(token);
+    });
   }
 
   @override

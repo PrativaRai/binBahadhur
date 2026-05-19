@@ -13,7 +13,8 @@ const client = new Client({
     }),
     puppeteer: {
         headless: true, //browser user laii na tha vae background ma run gare raakhxa
-        handleSIGINT: false, 
+        handleSIGINT: true, 
+        timeout: 60000,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',

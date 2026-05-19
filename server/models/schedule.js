@@ -45,7 +45,7 @@ const scheduleSchema = mongoose.Schema(
     status: {
       type: String,
       default: "pending", 
-      enum: ["pending", "accepted", "started", "completed", "cancelled"],
+      enum: ['pending', 'accepted', 'assigned', 'completed', 'rejected'],
     },
     wasteType: {
       type: String,

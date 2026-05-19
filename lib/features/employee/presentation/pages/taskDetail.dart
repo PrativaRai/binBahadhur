@@ -43,7 +43,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
     try {
       // Pass the ID from widget.task
-      final response = await _service.startTask(widget.task['_id'], token!);
+      final response = await _service.startTask(widget.task['_id'], token);
 
       if (response['success'] == true) {
         final rawProfile = response['task']['userId'];
@@ -134,6 +134,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
               title: "Schedule Type",
               icon: Icons.calendar_today,
               content: widget.task['scheduleType'] ?? 'N/A',
+            ),
+
+            _buildInfoCard(
+              title: "Description",
+              icon: Icons.description,
+              content: widget.task['description'] ?? 'Not specified',
             ),
             _buildInfoCard(
               title: "Date & Time",
