@@ -1,4 +1,6 @@
+import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
 import 'package:binbahadhur/features/schedule_pickup/presentation/pages/schedule_date.dart';
+import 'package:binbahadhur/features/user/presentation/pages/user_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/widgets/custom_big_button.dart';
 import 'package:binbahadhur/core/widgets/area_list_tile.dart';
@@ -45,6 +47,22 @@ class _SubAreaPageState extends State<SubAreaPage> {
     setState(() {
       currentIndex = index;
     });
+    if (index == 0) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+        (route) => false,
+      );
+    } else if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const UserProfilePage(),
+        ),
+      );
+    }
   },
 ),
       body: Padding(

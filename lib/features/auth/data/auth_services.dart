@@ -314,4 +314,44 @@ class AuthServices {
       return null;
     }
   }
+  //Get User Profile Data
+  Future<Map<String, dynamic>?> getUserProfile({
+    required BuildContext context,
+  }) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('x-auth-token');
+
+      // get current user id
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      String userId = userProvider.user.id;
+
+      if (token == null || token.isEmpty) return null;
+
+      http.Response res = await http.get(
+        Uri.parse('$uri/api/user-profile/$userId'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': token,
+        },
+      );
+
+      Map<String, dynamic>? data;
+
+      if (!context.mounted) return null;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          data = jsonDecode(res.body);
+        },
+      );
+
+      return data;
+    } catch (e) {
+      if (context.mounted) showSnackBar(context, "Profile Error: $e");
+      return null;
+    }
+  }
 }

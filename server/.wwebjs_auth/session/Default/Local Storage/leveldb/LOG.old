@@ -1,0 +1,6 @@
+2026/05/20-18:42:39.345 3268 Reusing MANIFEST D:\binBahadhur\server\.wwebjs_auth\session\Default\Local Storage\leveldb/MANIFEST-000001
+2026/05/20-18:42:39.356 3268 Recovering log #3
+2026/05/20-18:42:39.359 3268 Reusing old log D:\binBahadhur\server\.wwebjs_auth\session\Default\Local Storage\leveldb/000003.log 
+2026/05/20-18:43:39.382 6a90 Level-0 table #5: started
+2026/05/20-18:43:39.396 6a90 Level-0 table #5: 19167 bytes OK
+2026/05/20-18:43:39.401 6a90 Delete type=0 #3

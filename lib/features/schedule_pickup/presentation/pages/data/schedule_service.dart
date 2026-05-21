@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
-
 class ScheduleService {
   //yo maile phone ma chalauna lai ho la emulator ko lagi arkai halnuparchha hola
   //final String uri = 'http://192.168.18.109:3000';

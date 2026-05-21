@@ -1,4 +1,5 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
+import 'package:binbahadhur/features/user/presentation/pages/user_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -57,16 +58,25 @@ class HomePage extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: Image.asset(
-                          "assets/images/fohor_rookie.png",
-                          height: 60,
-                          width: 60,
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context)=> const UserProfilePage(),
+                          ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: Image.asset(
+                            "assets/images/fohor_rookie.png",
+                            height: 60,
+                            width: 60,
+                          ),
                         ),
                       ),
                     ],

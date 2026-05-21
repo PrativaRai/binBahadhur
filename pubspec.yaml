@@ -41,9 +41,10 @@ dependencies:
   fpdart: ^1.2.0
   http: ^1.6.0
   provider: ^6.1.5+1
-  shared_preferences: ^2.5.3
+  shared_preferences: ^2.5.5
   firebase_core: ^4.7.0
   firebase_auth: ^6.4.0
+  image_picker: ^1.2.2
 
 dev_dependencies:
   flutter_test:
