@@ -55,3 +55,7 @@ server/.env
 server/uploads/
 .postman/
 postman/
+
+# WhatsApp Web JS
+server/.wwebjs_auth/
+server/.wwebjs_cache/
