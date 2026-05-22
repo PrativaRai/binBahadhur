@@ -34,7 +34,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       body: FutureBuilder<Map<String, dynamic>?>(
         future: authServices.getUserProfile(context: context),
         builder: (context, snapshot) {
-
           // loading spinner while waiting
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -67,8 +66,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
             phone: data['phone'] ?? 'N/A',
             role: 'user',
             stats: {
-              "Task Done": data['tasksDone'] ?? 0,
-              "Incomplete": data['tasksIncomplete'] ?? 0,
+              "Previous": data['tasksDone'] ?? 0,
+              "Current": data['tasksIncomplete'] ?? 0,
+              "Points": data['points'] ?? 0,
             },
             actionButtons: [
               ElevatedButton(

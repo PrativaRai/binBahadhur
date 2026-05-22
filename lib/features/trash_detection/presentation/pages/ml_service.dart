@@ -42,7 +42,7 @@ class MlService {
     }
 
     // Prepare output buffer (make sure shape matches your model, here 10 classes)
-    var output = List.filled(10, 0.0).reshape([1, 10]);
+    var output = List.filled(4, 0.0).reshape([1, 4]);
 
     // Run inference
     interpreter!.run(input.reshape([1, 224, 224, 3]), output);

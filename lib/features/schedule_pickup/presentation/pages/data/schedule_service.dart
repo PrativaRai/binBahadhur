@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 class ScheduleService {
   //yo maile phone ma chalauna lai ho la emulator ko lagi arkai halnuparchha hola
-  //final String uri = 'http://192.168.18.109:3000';
-  final String uri = 'http://10.0.2.2:3000';
+  final String uri = 'http://192.168.18.110:3000';
+  //final String uri = 'http://10.0.2.2:3000';
 
   // CREATE SCHEDULE
   Future<String?> createSchedule({

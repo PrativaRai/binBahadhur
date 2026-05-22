@@ -58,4 +58,5 @@ postman/
 
 # WhatsApp Web JS
 server/.wwebjs_auth/
+server/.wwebjs_cache/server/.wwebjs_auth/
 server/.wwebjs_cache/
