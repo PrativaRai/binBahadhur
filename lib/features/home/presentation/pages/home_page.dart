@@ -2,28 +2,104 @@ import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/features/user/presentation/pages/user_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import 'package:binbahadhur/core/theme/app_pallete.dart';
-import 'package:binbahadhur/core/widgets/custom_option.dart';
-
 import 'package:binbahadhur/features/schedule_pickup/presentation/pages/area_page.dart';
 import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_area_page.dart';
 import 'package:provider/provider.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
+import 'package:binbahadhur/features/auth/data/auth_services.dart';
+import 'package:binbahadhur/core/widgets/bottom_nav_bar.dart';
+import 'package:binbahadhur/core/widgets/custom_option.dart';
+import 'package:binbahadhur/features/levels/presentation/current_level.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   static const String routeName = '/home';
 
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int incomplete = 0;
+  bool isLoading = true;
+  int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTasks();
+  }
+
+  void fetchTasks() async {
+    try {
+      final data = await AuthServices().getUserProfile(context: context);
+
+      if (data == null) {
+        setState(() => isLoading = false);
+        return;
+      }
+
+      setState(() {
+        incomplete = data['tasksIncomplete'] ?? 0;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context).user;
     final String name = user.name ?? "User";
     final String date = DateFormat('EEEE, d MMM').format(DateTime.now());
+    String getLevel(int points) {
+      if (points >= 100) return "bin";
+      if (points >= 50) return "general";
+      return "rookie";
+    }
+
+    String getLevelImage(int points) {
+      if (points >= 100) return "assets/images/binbahadur.png";
+      if (points >= 50) return "assets/images/general_garbage.png";
+      return "assets/images/fohor_rookie.png";
+    }
 
     return Scaffold(
       appBar: const CommonAppBar(title: "Home"),
+
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: currentIndex,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+
+          if (index == 0) {
+            return; // already home
+          }
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CurrentLevelPage()),
+            ).then((_) {
+              fetchTasks();
+            });
+          }
+
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            ).then((_) {
+              fetchTasks();
+            });
+          }
+        },
+      ),
+
       body: Column(
         children: [
           Container(
@@ -59,12 +135,15 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context)=> const UserProfilePage(),
-                          ),
-                          );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const UserProfilePage(),
+                            ),
+                          ).then((_) {
+                            fetchTasks();
+                          });
                         },
                         child: Container(
                           padding: const EdgeInsets.all(12),
@@ -118,13 +197,32 @@ class HomePage extends StatelessWidget {
                         icon: Icons.schedule,
                         label: "Schedule Pickup",
                         onTap: () {
+                          if (isLoading) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Loading...")),
+                            );
+                            return;
+                          }
+
+                          if (incomplete > 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "You already have a pending task!",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              //maile schedulepage vanda agadi area schedule ma lagnu ko lagi AreaPage() ma link gareko instead of SchedulePage()
                               builder: (context) => const AreaPage(),
                             ),
-                          );
+                          ).then((_) {
+                            fetchTasks();
+                          });
                         },
                       ),
 

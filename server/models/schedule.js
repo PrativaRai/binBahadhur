@@ -4,23 +4,22 @@ const scheduleSchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId, // Keep this as ObjectId for .populate()
-     ref: "User",    
-                          
+      ref: "User",
+
       required: true,
     },
-  
+
     phone: {
       type: String,
       required: [true, "Phone number is required"],
       trim: true,
- 
     },
 
     assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User", 
-    default: null,
-  },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
     area: {
       type: String,
       required: true,
@@ -44,8 +43,8 @@ const scheduleSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      default: "pending", 
-      enum: ['pending', 'accepted', 'assigned', 'completed', 'rejected'],
+      default: "pending",
+      enum: ["pending", "accepted", "assigned", "completed", "rejected"],
     },
     wasteType: {
       type: String,
@@ -58,6 +57,17 @@ const scheduleSchema = mongoose.Schema(
     },
     imageUrl: {
       type: String,
+    },
+    weightCollected: {
+      type: Number,
+      default: 0,
+    },
+    moneyPaid: {
+      type: Number,
+      default: 0,
+    },
+    completedAt: {
+      type: Date,
     },
   },
   { timestamps: true },

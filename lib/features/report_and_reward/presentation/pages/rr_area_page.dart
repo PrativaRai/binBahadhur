@@ -48,24 +48,20 @@ class _RRAreaPageState extends State<RRAreaPage> {
             currentIndex = index;
           });
           if (index == 0) {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
-        (route) => false,
-      );
-    } else if (index == 3) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const UserProfilePage(),
-        ),
-      );
-    }
-  },
-),
-      
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false,
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            );
+          }
+        },
+      ),
+
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(

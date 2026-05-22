@@ -21,7 +21,7 @@ class LevelsPage extends StatelessWidget {
             _levelBox(
               image: "assets/images/fohor_rookie.png",
               title: "Fohor Rookie",
-              kg: "5 kg Scheduled Pickups",
+              kg: "Start your journey with 0 kg pickups",
               reverse: false,
             ),
 
@@ -30,7 +30,7 @@ class LevelsPage extends StatelessWidget {
             _levelBox(
               image: "assets/images/general_garbage.png",
               title: "General Garbage",
-              kg: "25 kg Scheduled Pickups",
+              kg: "50 kg Scheduled Pickups",
               reverse: true,
             ),
 
@@ -39,7 +39,7 @@ class LevelsPage extends StatelessWidget {
             _levelBox(
               image: "assets/images/binbahadur.png",
               title: "Binbahadur",
-              kg: "50 kg Scheduled Pickups",
+              kg: "100 kg Scheduled Pickups",
               reverse: false,
             ),
           ],
@@ -74,7 +74,7 @@ class LevelsPage extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            "Required: $kg",
+            "$kg",
             textAlign: reverse ? TextAlign.right : TextAlign.left,
             style: TextStyle(fontSize: 14, color: AppPallete.blackColor),
           ),

@@ -27,16 +27,10 @@ class _SPSaveDetailsPageState extends State<SPSaveDetailsPage> {
   final TextEditingController controller = TextEditingController();
 
   final Map<String, double> pricePerKg = {
-    "Battery": 80,
-    "Biological": 10,
-    "Cardboard": 15,
-    "Clothes": 30,
-    "Glass": 20,
-    "Metal": 100,
-    "Paper": 12,
-    "Plastic": 25,
-    "Shoes": 40,
-    "Trash": 5,
+    "glass": 20,
+    "metal": 100,
+    "paper": 12,
+    "plastic": 25,
   };
 
   bool isLoading = false;

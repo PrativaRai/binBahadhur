@@ -46,18 +46,7 @@ class _PhotoPreviewPageState extends State<PhotoPreviewPage> {
       await mlService.loadModel();
       int classIndex = await mlService.predict(widget.imageFile);
 
-      List<String> labels = [
-        "Battery",
-        "Biological",
-        "Cardboard",
-        "Clothes",
-        "Glass",
-        "Metal",
-        "Paper",
-        "Plastic",
-        "Shoes",
-        "Trash",
-      ];
+      List<String> labels = ["glass", "metal", "paper", "plastic"];
 
       if (!mounted) return;
 
