@@ -2,7 +2,9 @@ const express = require("express");
 const scheduleRouter = express.Router();
 const Schedule = require("../models/schedule");
 const auth = require("../middleware/auth");
-const upload = require("../middleware/upload");
+
+// Destructure the two tools directly from the middleware file
+const { upload, uploadToCloudinary } = require("../middleware/upload");
 
 //CREATE SCHEDULE
 
@@ -41,11 +43,18 @@ scheduleRouter.post("/api/schedule", auth, async (req, res) => {
 scheduleRouter.put(
   "/api/schedule/:id",
   auth,
-  upload.single("image"),
+  upload.single("image"), // Parses the incoming image into req.file.buffer
   async (req, res) => {
     try {
       const { wasteType, description, pricePerKg } = req.body;
-      const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+      let imageUrl = undefined;
+
+      // If an image was provided, pass its memory buffer to Cloudinary
+      if (req.file) {
+        const cloudResult = await uploadToCloudinary(req.file.buffer);
+        imageUrl = cloudResult.secure_url; // Secure CDN URL link from Cloudinary
+      }
 
       const schedule = await Schedule.findById(req.params.id);
 
@@ -68,6 +77,7 @@ scheduleRouter.put(
         schedule,
       });
     } catch (e) {
+      console.error("UPDATE ROUTE CRASHED:", e);
       res.status(500).json({ success: false, error: e.message });
     }
   },

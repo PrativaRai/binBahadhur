@@ -210,7 +210,7 @@ employeeRouter.post(
       }
 
       // Update task details
-      const weight = Number(weightCollected);
+      const weight = Number(weightCollected) || 0;
       task.status = "completed";
       task.weightCollected = weightCollected; // Ensure these fields exist in your Schedule model
       task.moneyPaid = moneyPaid;
@@ -219,7 +219,8 @@ employeeRouter.post(
       await task.save();
       const user = await User.findById(task.userId);
 
-      user.points = (user.points || 0) + weight;
+      const currentPoints = Number(user.points) || 0;
+      user.points = currentPoints + weight;
 
       await user.save();
 
@@ -227,6 +228,7 @@ employeeRouter.post(
         success: true,
         message: "Task completed successfully",
         task,
+        updatedUserPoints: user.points,
       });
     } catch (e) {
       res.status(500).json({ success: false, error: e.message });
