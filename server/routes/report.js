@@ -2,7 +2,7 @@ const express = require("express");
 const reportRouter = express.Router();
 const Report = require("../models/report");
 const auth = require("../middleware/auth");
-const upload = require("../middleware/upload");
+const { upload, uploadToCloudinary } = require("../middleware/upload"); //new way to import the upload tools
 
 // CREATE REPORT
 
@@ -40,7 +40,12 @@ reportRouter.put(
     try {
       const { description } = req.body;
 
-      const imageUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
+      let imageUrl = undefined;
+
+      if (req.file) {
+        const cloudResult = await uploadToCloudinary(req.file.buffer);
+        imageUrl = cloudResult.secure_url;
+      }
 
       const updatedReport = await Report.findByIdAndUpdate(
         req.params.id,
@@ -63,6 +68,7 @@ reportRouter.put(
         report: updatedReport,
       });
     } catch (e) {
+      console.error("REPORT UPDATE CRASHED:", e);
       res.status(500).json({
         success: false,
         error: e.message,
