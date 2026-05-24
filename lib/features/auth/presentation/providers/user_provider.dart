@@ -9,6 +9,7 @@ class UserProvider extends ChangeNotifier {
     password: '',
     type: '',
     token: '',
+    points: 0, // 1. Set initial points value to 0
   );
 
   User get user => _user;
@@ -21,5 +22,11 @@ class UserProvider extends ChangeNotifier {
   void setUserFromModel(User user) {
     _user = user;
     notifyListeners();
+  }
+
+  // 2. Added explicit method to update points independently
+  void updatePoints(int freshPoints) {
+    _user = _user.copyWith(points: freshPoints);
+    notifyListeners(); // <-- This triggers HomePage to swap out the badge assets immediately!
   }
 }

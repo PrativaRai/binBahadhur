@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/core/widgets/custom_app_bar.dart';
 import 'package:binbahadhur/core/widgets/custom_big_button.dart';
+import 'package:provider/provider.dart';
+import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 
 class RewardPage extends StatefulWidget {
-  final int points;
+  final int points; // Points from the single completed task
 
   const RewardPage({super.key, required this.points});
 
@@ -18,6 +20,7 @@ class _RewardPageState extends State<RewardPage>
 
   late String imagePath;
   late List<String> messages;
+  late int userTotalPoints; // Added to keep track of the exact total
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
@@ -33,20 +36,31 @@ class _RewardPageState extends State<RewardPage>
   void initState() {
     super.initState();
 
-    final level = getLevel(widget.points);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userTotalPoints =
+        userProvider.user.points; // Total points stored in provider
+    final level = getLevel(userTotalPoints);
 
     if (level == "rookie") {
       imagePath = "assets/images/fohor_rookie.png";
-      messages = ["Welcome!", "Keep going!", "Reach 50 for next level"];
+      messages = [
+        "You earned +${widget.points} points!",
+        "Your total balance is now $userTotalPoints points.",
+        "Reach 50 total points to unlock the next level!",
+      ];
     } else if (level == "general") {
       imagePath = "assets/images/general_garbage.png";
-      messages = ["Good progress!", "Bin Bahadur at 100!", "You're close!"];
+      messages = [
+        "Awesome! +${widget.points} points added.",
+        "Total Balance: $userTotalPoints points.",
+        "Bin Bahadur rank unlocks at 100 total points!",
+      ];
     } else {
       imagePath = "assets/images/binbahadur.png";
       messages = [
-        "FINAL STATUS UNLOCKED!",
-        "You are Bin Bahadur!",
-        "Max level achieved!",
+        "+${widget.points} points claimed successfully!",
+        "Total Balance: $userTotalPoints points.",
+        "You are Bin Bahadur! Max level achieved!",
       ];
     }
 
@@ -107,7 +121,7 @@ class _RewardPageState extends State<RewardPage>
                   child: Text(
                     messages[currentIndex],
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: AppPallete.blackColor,
                     ),
