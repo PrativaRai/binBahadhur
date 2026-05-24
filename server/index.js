@@ -16,6 +16,7 @@ const adminRouter = require("./routes/admin");
 const scheduleRouter = require("./routes/schedule");
 const reportRouter = require("./routes/report");
 const userProfileRouter = require('./routes/userProfile');
+const userNotification = require("./routes/userNotification");
 
 
 // init
@@ -33,6 +34,8 @@ app.use(adminRouter);
 app.use(scheduleRouter);
 app.use(reportRouter);
 app.use(userProfileRouter);
+
+app.use("/api/user", userNotification);
 
 
 // static files

@@ -1,4 +1,6 @@
 import 'package:binbahadhur/core/constants/common_appbar.dart';
+import 'package:binbahadhur/features/user/presentation/pages/userNotificationScreen.dart';
+import 'package:binbahadhur/features/user/presentation/pages/user_complain.dart';
 import 'package:binbahadhur/features/user/presentation/pages/user_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -80,6 +82,14 @@ class _HomePageState extends State<HomePage> {
           if (index == 0) {
             return; // already home
           }
+
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserComplain()),
+            );
+          }
+
           if (index == 2) {
             Navigator.push(
               context,
@@ -96,6 +106,15 @@ class _HomePageState extends State<HomePage> {
             ).then((_) {
               fetchTasks();
             });
+          }
+
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UserNotificationScreen(),
+              ), // Changed from UserComplain()
+            );
           }
         },
       ),

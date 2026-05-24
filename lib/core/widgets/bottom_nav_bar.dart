@@ -21,15 +21,17 @@ class BottomNavBar extends StatelessWidget {
       backgroundColor: Colors.white,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notification',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Complain'),
         BottomNavigationBarItem(
           icon: Icon(Icons.emoji_events),
           label: 'Levels',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+
+        BottomNavigationBarItem(
+          icon: Icon(Icons.notifications),
+          label: 'Notification',
+        ),
       ],
     );
   }

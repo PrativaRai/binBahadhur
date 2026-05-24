@@ -42,7 +42,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Pass the ID from widget.task
       final response = await _service.startTask(widget.task['_id'], token);
 
       if (response['success'] == true) {
@@ -50,13 +49,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
 
         if (mounted) {
           if (rawProfile is Map<String, dynamic>) {
-            // Navigate to Contact Info Page with the correct ID
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ContactInfoScreen(
                   profile: rawProfile,
-                  taskId: widget.task['_id'], // Fixed: Accessing via widget
+                  taskId: widget.task['_id'],
                 ),
               ),
             );
@@ -121,6 +119,9 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       existingPhone = widget.task['userId']['phone'];
     }
 
+    // Capture the image URL safely from your backend schema payload
+    final String? imageUrl = widget.task['imageUrl'];
+
     return Scaffold(
       appBar: const CommonAppBar(title: "Task Details"),
       backgroundColor: AppPallete.whiteColor,
@@ -129,13 +130,19 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         child: Column(
           children: [
             _buildHeader(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            // --- NEW: Task Image Container ---
+            if (imageUrl != null && imageUrl.isNotEmpty) ...[
+              _buildImageCard(imageUrl),
+              const SizedBox(height: 16),
+            ],
+
             _buildInfoCard(
               title: "Schedule Type",
               icon: Icons.calendar_today,
               content: widget.task['scheduleType'] ?? 'N/A',
             ),
-
             _buildInfoCard(
               title: "Description",
               icon: Icons.description,
@@ -283,6 +290,49 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             style: const TextStyle(fontSize: 18, color: AppPallete.blackColor),
           ),
         ],
+      ),
+    );
+  }
+
+  // --- NEW: Helper widget to cleanly display your image ---
+  Widget _buildImageCard(String url) {
+    return Container(
+      width: double.infinity,
+      height: 200,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppPallete.blackColor),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(
+          11,
+        ), // 1px less than container to sit nicely
+        child: Image.network(
+          url,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.green),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                  SizedBox(height: 4),
+                  Text(
+                    "Failed to load image",
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

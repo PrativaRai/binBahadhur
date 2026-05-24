@@ -71,7 +71,7 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "Employee Reports"),
+      appBar: CommonAppBar(title: "Reports"),
       backgroundColor: AppPallete.whiteColor,
       body: RefreshIndicator(
         onRefresh: () async => fetchData(),
