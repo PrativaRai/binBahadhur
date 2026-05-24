@@ -34,44 +34,59 @@ class _HomePageState extends State<HomePage> {
     fetchTasks();
   }
 
+  // Helper Methods moved outside build to optimize memory allocation
+  String getLevel(int points) {
+    if (points >= 100) return "bin";
+    if (points >= 50) return "general";
+    return "rookie";
+  }
+
+  String getLevelImage(int points) {
+    if (points >= 100) return "assets/images/binbahadur.png";
+    if (points >= 50) return "assets/images/general_garbage.png";
+    return "assets/images/fohor_rookie.png";
+  }
+
   void fetchTasks() async {
     try {
       final data = await AuthServices().getUserProfile(context: context);
 
       if (data == null) {
-        setState(() => isLoading = false);
+        if (mounted) setState(() => isLoading = false);
         return;
       }
 
-      setState(() {
-        incomplete = data['tasksIncomplete'] ?? 0;
-        isLoading = false;
-      });
+      if (mounted) {
+        // 1. Extract fresh points from database payload
+        final int updatedPoints = data['points'] ?? 0;
+
+        // 2. Sync directly with Provider to trigger listener updates
+        Provider.of<UserProvider>(
+          context,
+          listen: false,
+        ).updatePoints(updatedPoints);
+
+        setState(() {
+          incomplete = data['tasksIncomplete'] ?? 0;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Listens to UserProvider changes. When updatePoints() calls notifyListeners(), this rebuilds!
     final user = Provider.of<UserProvider>(context).user;
     final String name = user.name ?? "User";
     final String date = DateFormat('EEEE, d MMM').format(DateTime.now());
-    String getLevel(int points) {
-      if (points >= 100) return "bin";
-      if (points >= 50) return "general";
-      return "rookie";
-    }
-
-    String getLevelImage(int points) {
-      if (points >= 100) return "assets/images/binbahadur.png";
-      if (points >= 50) return "assets/images/general_garbage.png";
-      return "assets/images/fohor_rookie.png";
-    }
 
     return Scaffold(
       appBar: const CommonAppBar(title: "Home"),
-
       bottomNavigationBar: BottomNavBar(
         currentIndex: currentIndex,
         onTap: (index) {
@@ -80,14 +95,19 @@ class _HomePageState extends State<HomePage> {
           });
 
           if (index == 0) {
-            return; // already home
+            return; // Already home
           }
 
           if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const UserComplain()),
-            );
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from complain
+              }
+            });
           }
 
           if (index == 2) {
@@ -95,30 +115,40 @@ class _HomePageState extends State<HomePage> {
               context,
               MaterialPageRoute(builder: (context) => const CurrentLevelPage()),
             ).then((_) {
-              fetchTasks();
-            });
-          }
-
-          if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserProfilePage()),
-            ).then((_) {
-              fetchTasks();
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from level page
+              }
             });
           }
 
           if (index == 4) {
             Navigator.push(
               context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from profile
+              }
+            });
+          }
+
+          if (index == 3) {
+            Navigator.push(
+              context,
               MaterialPageRoute(
                 builder: (context) => const UserNotificationScreen(),
-              ), // Changed from UserComplain()
-            );
+              ),
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from notifications
+              }
+            });
           }
         },
       ),
-
       body: Column(
         children: [
           Container(
@@ -161,7 +191,10 @@ class _HomePageState extends State<HomePage> {
                               builder: (context) => const UserProfilePage(),
                             ),
                           ).then((_) {
-                            fetchTasks();
+                            if (mounted) {
+                              setState(() => currentIndex = 0);
+                              fetchTasks();
+                            }
                           });
                         },
                         child: Container(
@@ -171,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.white,
                           ),
                           child: Image.asset(
-                            "assets/images/fohor_rookie.png",
+                            getLevelImage(user.points),
                             height: 60,
                             width: 60,
                           ),
@@ -183,7 +216,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-
           Expanded(
             child: Container(
               width: double.infinity,
@@ -206,9 +238,7 @@ class _HomePageState extends State<HomePage> {
                       color: AppPallete.blackColor,
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -240,11 +270,13 @@ class _HomePageState extends State<HomePage> {
                               builder: (context) => const AreaPage(),
                             ),
                           ).then((_) {
-                            fetchTasks();
+                            if (mounted) {
+                              setState(() => currentIndex = 0);
+                              fetchTasks();
+                            }
                           });
                         },
                       ),
-
                       ServiceCard(
                         icon: Icons.card_giftcard,
                         label: "Report & Reward",
@@ -254,7 +286,12 @@ class _HomePageState extends State<HomePage> {
                             MaterialPageRoute(
                               builder: (context) => const RRAreaPage(),
                             ),
-                          );
+                          ).then((_) {
+                            if (mounted) {
+                              setState(() => currentIndex = 0);
+                              fetchTasks();
+                            }
+                          });
                         },
                       ),
                     ],

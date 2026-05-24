@@ -284,14 +284,30 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
                                       ),
                                     ),
                                     onPressed: () {
-                                      final int points =
-                                          request['points'] ?? 10;
+                                      // FIXED: Extract points mapping directly from 'weightCollected' field
+                                      int calculatedPoints = 0;
+                                      if (request['weightCollected'] != null) {
+                                        // tryParse as double first to elegantly handle string-decimals like "25.5"
+                                        final double weight =
+                                            double.tryParse(
+                                              request['weightCollected']
+                                                  .toString(),
+                                            ) ??
+                                            0.0;
+                                        calculatedPoints = weight.round();
+                                      }
+
+                                      // Fallback logic check if value evaluates to zero
+                                      if (calculatedPoints == 0) {
+                                        calculatedPoints = 10;
+                                      }
 
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) =>
-                                              RewardPage(points: points),
+                                          builder: (context) => RewardPage(
+                                            points: calculatedPoints,
+                                          ),
                                         ),
                                       );
                                     },

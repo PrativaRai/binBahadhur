@@ -26,12 +26,12 @@ class BottomNavBar extends StatelessWidget {
           icon: Icon(Icons.emoji_events),
           label: 'Levels',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
 
         BottomNavigationBarItem(
-          icon: Icon(Icons.notifications),
-          label: 'Notification',
+          icon: Icon(Icons.radio_button_checked_rounded),
+          label: 'Status',
         ),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
   }
