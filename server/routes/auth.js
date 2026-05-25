@@ -152,59 +152,96 @@ authRouter.post("/api/reset-password", async (req, res) => {
     }
 });
 //complain
-// === INLINE AUTH MIDDLEWARE ===
-const customAuth = (req, res, next) => {
-    try {
-        const token = req.header("x-auth-token");
-        if (!token) {
-            return res.status(401).json({ msg: "No auth token, access denied." });
-        }
+// // === INLINE AUTH MIDDLEWARE ===
+// const customAuth = (req, res, next) => {
+//     try {
+//         const token = req.header("x-auth-token");
+//         if (!token) {
+//             return res.status(401).json({ msg: "No auth token, access denied." });
+//         }
 
-        // Verifies using the exact key your signin route uses
-        const verified = jwt.verify(token, "passwordKey");
-        if (!verified) {
-            return res.status(401).json({ msg: "Token verification failed, authorization denied." });
-        }
+//         // Verifies using the exact key your signin route uses
+//         const verified = jwt.verify(token, "passwordKey");
+//         if (!verified) {
+//             return res.status(401).json({ msg: "Token verification failed, authorization denied." });
+//         }
 
-        req.userId = verified.id; // Sets the user ID for Mongoose
-        next();
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+//         req.userId = verified.id; // Sets the user ID for Mongoose
+//         next();
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// };
+
+// // === SUBMIT EMPLOYEE COMPLAINT ROUTE ===
+// // We use customAuth here so it doesn't look for an external file!
+// authRouter.post("/api/user/report-employee", customAuth, async (req, res) => {
+//     try {
+//         const { employeePhone, description, employeeName } = req.body;
+
+//         if (!description || !employeePhone || !employeeName) {
+//             return res.status(400).json({ 
+//                 msg: "Please provide employee name, phone number, and a description." 
+//             });
+//         }
+
+//         // To make sure Complain model is defined, let's pull it directly if needed
+//         const Complain = require("../models/complain"); 
+
+//         let complain = new Complain({
+//             phoneNumber: employeePhone,
+//             description: description,
+//             employee: employeeName,
+//             userId: req.userId, 
+//         });
+
+//         await complain.save();
+
+//         res.json({
+//             success: true,
+//             msg: "Complaint registered and forwarded to Admin successfully",
+//             complain,
+//         });
+//     } catch (e) {
+//         res.status(500).json({ error: e.message });
+//     }
+// });
+
+
+authRouter.post("/api/user/report-employee", auth, async (req, res) => {
+  try {
+    const { employeePhone, description, employeeName } = req.body;
+
+    // Search for the target employee and make sure they are actually an employee profile
+    const targetEmployee = await User.findOne({ 
+      phone: employeePhone, 
+      type: "employee" 
+    });
+
+    if (!targetEmployee) {
+      return res.status(404).json({ 
+        success: false, 
+        msg: "No employee account found with this phone number." 
+      });
     }
-};
 
-// === SUBMIT EMPLOYEE COMPLAINT ROUTE ===
-// We use customAuth here so it doesn't look for an external file!
-authRouter.post("/api/user/report-employee", customAuth, async (req, res) => {
-    try {
-        const { employeePhone, description, employeeName } = req.body;
+    let complain = new Complain({
+      phoneNumber: employeePhone,  
+      description: description,    
+      employee: employeeName,      
+      // Safety Fallback: Checks both variations of token assignment depending on your middleware config
+      userId: req.userId || req.user, 
+    });
 
-        if (!description || !employeePhone || !employeeName) {
-            return res.status(400).json({ 
-                msg: "Please provide employee name, phone number, and a description." 
-            });
-        }
+    await complain.save();
 
-        // To make sure Complain model is defined, let's pull it directly if needed
-        const Complain = require("../models/complain"); 
-
-        let complain = new Complain({
-            phoneNumber: employeePhone,
-            description: description,
-            employee: employeeName,
-            userId: req.userId, 
-        });
-
-        await complain.save();
-
-        res.json({
-            success: true,
-            msg: "Complaint registered and forwarded to Admin successfully",
-            complain,
-        });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+    res.json({
+      success: true,
+      msg: "Complaint registered successfully",
+      complain,
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
-
 module.exports = authRouter;

@@ -13,7 +13,6 @@ class UserService {
     required String employeeName,
   }) async {
     try {
-      // Pulling the authentication token from your global user state management
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       final String token = userProvider.user.token;
 
@@ -21,7 +20,7 @@ class UserService {
         Uri.parse('$uri/api/user/report-employee'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': token, // Passes token to the backend auth middleware
+          'x-auth-token': token,
         },
         body: jsonEncode({
           'employeePhone': employeePhone,
@@ -29,6 +28,15 @@ class UserService {
           'employeeName': employeeName,
         }),
       );
+
+      // SAFETY CHECK: If the server sends HTML instead of JSON, capture it gracefully
+      if (res.body.startsWith('<!DOCTYPE html>')) {
+        return {
+          'success': false,
+          'error':
+              'Server returned HTML instead of data. Check route URL or backend logs. (Status: ${res.statusCode})',
+        };
+      }
 
       final decodedResponse = jsonDecode(res.body);
 

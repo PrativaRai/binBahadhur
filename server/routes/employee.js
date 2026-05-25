@@ -118,31 +118,42 @@ employeeRouter.get(
     } catch (e) {
       res.status(500).json({ success: false, error: e.message });
     }
-  },
-);
+  },);
 
-// 4. ADD COMPLAIN
+//complain
 employeeRouter.post(
   "/api/worker/add-complain",
-  auth,
   employeeMiddleware,
   async (req, res) => {
     try {
-      const { phoneNumber, description } = req.body;
-      const employeeUser = await User.findById(req.userId);
+      const { phoneNumber, description, employee } = req.body;
+
+      // FIXED: Search for the phone number AND ensure the account type is strictly 'user'
+      const targetCustomer = await User.findOne({ 
+        phone: phoneNumber, 
+        type: "user" 
+      });
+
+      // If the number belongs to an employee (or doesn't exist), targetCustomer will be null
+      if (!targetCustomer) {
+        return res.status(404).json({ 
+          success: false, 
+          msg: "No customer account found with this phone number." 
+        });
+      }
 
       let complain = new Complain({
-        phoneNumber,
+        phoneNumber,               
         description,
-        employee: employeeUser.name,
-        userId: req.userId,
+        employee: employee,        
+        userId: targetCustomer._id, 
       });
 
       await complain.save();
 
       res.json({
         success: true,
-        msg: "Complain registered successfully",
+        msg: `Complaint against ${targetCustomer.name} registered successfully`,
         complain,
       });
     } catch (e) {
@@ -150,7 +161,6 @@ employeeRouter.post(
     }
   },
 );
-
 // GET /api/profile/:id
 employeeRouter.get("/api/profile/:id", async (req, res) => {
   try {

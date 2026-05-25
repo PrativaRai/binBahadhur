@@ -81,19 +81,20 @@ class EmployeeService {
   }) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     try {
-      ComplainModel complain = ComplainModel(
-        phoneNumber: phoneNumber,
-        description: description,
-        employee: employee,
-      );
+      // Package the data exactly how the UI collects it
+      final Map<String, dynamic> complainData = {
+        'phoneNumber': phoneNumber,
+        'description': description,
+        'employee': employee,
+      };
 
       final response = await http.post(
         Uri.parse('$baseUrl/api/worker/add-complain'),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
-          'x-auth-token': userProvider.user.token,
+          'x-auth-token': userProvider.user.token, // Secure employee token
         },
-        body: complain.toJson(),
+        body: jsonEncode(complainData),
       );
 
       return _handleResponse(response);
