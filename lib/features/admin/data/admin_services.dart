@@ -133,6 +133,7 @@ class AdminServices {
       };
     }
   }
+
   // 5. FETCH ALL BIN OVERFLOW REPORTS
   Future<List<dynamic>> fetchAllReports(BuildContext context) async {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -162,5 +163,65 @@ class AdminServices {
       }
     }
     return reportList;
+  }
+
+  // 6. ACCEPT REPORT (GIVES USER +1 POINT)
+  Future<void> acceptReport(BuildContext context, String reportId) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      final res = await http.post(
+        Uri.parse('$uri/admin/accept-report'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': userProvider.user.token,
+        },
+        body: jsonEncode({'reportId': reportId}),
+      );
+
+      if (!context.mounted) return;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, "Report accepted (+1 point)");
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, e.toString());
+      }
+    }
+  }
+
+  // 7. REJECT REPORT
+  Future<void> rejectReport(BuildContext context, String reportId) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+    try {
+      final res = await http.post(
+        Uri.parse('$uri/admin/reject-report'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': userProvider.user.token,
+        },
+        body: jsonEncode({'reportId': reportId}),
+      );
+
+      if (!context.mounted) return;
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          showSnackBar(context, "Report rejected");
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, e.toString());
+      }
+    }
   }
 }

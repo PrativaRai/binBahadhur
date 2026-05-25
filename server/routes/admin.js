@@ -1,100 +1,173 @@
-const express = require('express');
+const express = require("express");
 const mongoose = require("mongoose");
 const adminRouter = express.Router();
+
 const Complain = require("../models/complain");
-const User = require("../models/user"); 
+const User = require("../models/user");
 const Schedule = require("../models/schedule");
+const Report = require("../models/report");
+
 const adminMiddleware = require("../middleware/admin");
 
-//GET ALL COMPLAINTS
-adminRouter.get('/admin/get-complain', adminMiddleware, async (req, res) => {
-    try {
-        const complain = await Complain.find({}).sort({ createdAt: -1 });
-        res.json({ success: true, complaints: complain });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+// GET complaints
+adminRouter.get("/admin/get-complain", adminMiddleware, async (req, res) => {
+  try {
+    const complaints = await Complain.find({}).sort({ createdAt: -1 });
+
+    res.json({ success: true, complaints });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
 
-//RESOLVE / DELETE COMPLAINT
-adminRouter.post('/admin/delete-complain', adminMiddleware, async (req, res) => {
+// DELETE complaint
+adminRouter.post(
+  "/admin/delete-complain",
+  adminMiddleware,
+  async (req, res) => {
     try {
-        const { id } = req.body;
-        let complain = await Complain.findByIdAndDelete(id);
-        res.json(complain);
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
-});
+      const { id } = req.body;
 
-// UPDATE USER STATUS (SUSPEND/ACTIVATE)
-adminRouter.post("/admin/update-user-status", adminMiddleware, async (req, res) => {
+      const deleted = await Complain.findByIdAndDelete(id);
+
+      if (!deleted) {
+        return res
+          .status(404)
+          .json({ success: false, msg: "Complaint not found" });
+      }
+
+      res.json({ success: true, deleted });
+    } catch (e) {
+      res.status(500).json({ success: false, error: e.message });
+    }
+  },
+);
+
+// UPDATE user status
+adminRouter.post(
+  "/admin/update-user-status",
+  adminMiddleware,
+  async (req, res) => {
     try {
-        
-        const { phoneNumber, targetStatus } = req.body;
+      const { phoneNumber, targetStatus } = req.body;
 
-        
-        const user = await User.findOneAndUpdate(
-            { phone: phoneNumber }, 
-            { status: targetStatus },
-            { returnDocument: 'after' } 
-        );
+      const user = await User.findOneAndUpdate(
+        { phone: phoneNumber },
+        { status: targetStatus },
+        { new: true },
+      );
 
-        if (!user) {
-           
-            return res.status(400).json({ msg: "User with this phone number not found!" });
-        }
+      if (!user) {
+        return res.status(404).json({ success: false, msg: "User not found" });
+      }
 
-        res.json(user);
+      res.json({ success: true, user });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+      res.status(500).json({ success: false, error: e.message });
     }
-});
+  },
+);
 
-//profile admin
+// GET admin profile
 adminRouter.get("/api/profile/:id", adminMiddleware, async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        
-        if (!user) {
-            return res.status(404).json({ error: "Admin profile not found" });
-        }
+  try {
+    const user = await User.findById(req.params.id);
 
-        
-        res.json({
-            name: user.name,
-            phone: user.phone,
-            role: user.type, 
-            profilePic: user.profilePic || "",
-        });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "Admin not found" });
     }
+
+    res.json({
+      success: true,
+      profile: {
+        name: user.name,
+        phone: user.phone,
+        role: user.type,
+        profilePic: user.profilePic || "",
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
 
-//get notification
+// GET tasks
 adminRouter.get("/admin/track-tasks", adminMiddleware, async (req, res) => {
-    try {
-        // Find all schedules and populate both Customer and Employee details
-        const tasks = await Schedule.find()
-            .populate("userId", "name phone")    // Populate Customer info
-            .populate("assignedTo", "name phone") // Populate Employee info
-            .sort({ updatedAt: -1 });
+  try {
+    const tasks = await Schedule.find()
+      .populate("userId", "name phone")
+      .populate("assignedTo", "name phone")
+      .sort({ updatedAt: -1 });
 
-        res.json({ success: true, tasks: tasks || [] });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
-    }
+    res.json({ success: true, tasks });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
-// GET ALL REPORTS (ADMIN)
-adminRouter.get('/admin/get-reports', adminMiddleware, async (req, res) => {
-    try {
-        const Report = require('../models/report');
-        const reports = await Report.find({}).sort({ createdAt: -1 });
-        res.json({ success: true, reports });
-    } catch (e) {
-        res.status(500).json({ error: e.message });
+
+// GET reports
+adminRouter.get("/admin/get-reports", adminMiddleware, async (req, res) => {
+  try {
+    const reports = await Report.find({}).sort({ createdAt: -1 });
+
+    res.json({ success: true, reports });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// ACCEPT report + add points
+adminRouter.post("/admin/accept-report", adminMiddleware, async (req, res) => {
+  try {
+    const { reportId } = req.body;
+
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ success: false, msg: "Report not found" });
     }
+
+    if (report.status !== "pending") {
+      return res.status(400).json({ success: false, msg: "Already processed" });
+    }
+
+    report.status = "accepted";
+    await report.save();
+
+    const user = await User.findOneAndUpdate(
+      { phone: report.phone },
+      { $inc: { points: 1 } },
+      { new: true },
+    );
+
+    if (!user) {
+      return res.status(404).json({ success: false, msg: "User not found" });
+    }
+
+    res.json({ success: true, report });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+// REJECT report
+adminRouter.post("/admin/reject-report", adminMiddleware, async (req, res) => {
+  try {
+    const { reportId } = req.body;
+
+    const report = await Report.findById(reportId);
+
+    if (!report) {
+      return res.status(404).json({ success: false, msg: "Report not found" });
+    }
+
+    report.status = "rejected";
+    await report.save();
+
+    res.json({ success: true, report });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
 });
 
 module.exports = adminRouter;
