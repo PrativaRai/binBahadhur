@@ -3,6 +3,7 @@ import 'package:binbahadhur/features/admin/presentation/pages/adminPrrofilePage.
 import 'package:binbahadhur/features/admin/presentation/pages/adminTrackingScreen.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/manage_employee.dart';
 import 'package:binbahadhur/features/admin/presentation/pages/reports_pages.dart';
+import 'package:binbahadhur/features/admin/presentation/pages/bin_reports_page.dart';
 
 import 'package:flutter/material.dart';
 
@@ -20,6 +21,7 @@ class _AdminPageState extends State<AdminPage> {
   final List<Widget> pages = [
     const AdminTrackingScreen(),
     const ReportsPage(),
+    const BinReportsPage(), 
     const ManageEmployee(),
     const AdminProfilePage(),
   ];
@@ -42,16 +44,27 @@ class _AdminPageState extends State<AdminPage> {
           });
         },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: "Home"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard), 
+            label: "Home"),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment_late),
             label: "Reports",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.delete_outline), 
+            label: "Bin Reports"),
+          
+          BottomNavigationBarItem(
             icon: Icon(Icons.manage_accounts),
             label: "Manage",
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person), 
+            label: "Profile"),
+          
+
+          
         ],
       ),
     );

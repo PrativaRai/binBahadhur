@@ -86,4 +86,15 @@ adminRouter.get("/admin/track-tasks", adminMiddleware, async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 });
+// GET ALL REPORTS (ADMIN)
+adminRouter.get('/admin/get-reports', adminMiddleware, async (req, res) => {
+    try {
+        const Report = require('../models/report');
+        const reports = await Report.find({}).sort({ createdAt: -1 });
+        res.json({ success: true, reports });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
 module.exports = adminRouter;

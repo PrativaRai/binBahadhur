@@ -133,4 +133,34 @@ class AdminServices {
       };
     }
   }
+  // 5. FETCH ALL BIN OVERFLOW REPORTS
+  Future<List<dynamic>> fetchAllReports(BuildContext context) async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    List<dynamic> reportList = [];
+    try {
+      http.Response res = await http.get(
+        Uri.parse('$uri/admin/get-reports'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'x-auth-token': userProvider.user.token,
+        },
+      );
+
+      if (!context.mounted) return [];
+
+      httpErrorHandle(
+        response: res,
+        context: context,
+        onSuccess: () {
+          final Map<String, dynamic> decodedData = jsonDecode(res.body);
+          reportList = decodedData['reports'];
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, "Fetch Error: ${e.toString()}");
+      }
+    }
+    return reportList;
+  }
 }
