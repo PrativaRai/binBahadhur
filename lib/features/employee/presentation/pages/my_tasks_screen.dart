@@ -2,7 +2,7 @@ import 'package:binbahadhur/core/constants/common_appbar.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/employee/presentation/pages/taskDetail.dart';
-import 'package:binbahadhur/features/employee/services/employee_service.dart'; // fixed import
+import 'package:binbahadhur/features/employee/services/employee_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,11 +17,12 @@ class MyTasksScreen extends StatefulWidget {
 class _MyTasksScreenState extends State<MyTasksScreen> {
   final EmployeeService _service = EmployeeService();
   Future<Map<String, dynamic>>? _tasksFuture;
+
   void _loadTasks() {
     final token = Provider.of<UserProvider>(context, listen: false).user.token;
     setState(() {
-      // NOTE: Ensure your service/backend now returns both 'pending' and 'started'
-      _tasksFuture = _service.fetchAvailableTasks(token);
+      // FIX: Changed from fetchAvailableTasks to fetchMyTasks
+      _tasksFuture = _service.fetchMyTasks(token);
     });
   }
 
@@ -36,7 +37,9 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CommonAppBar(title: "Available Job"),
+      appBar: const CommonAppBar(
+        title: "My Assigned Jobs",
+      ), // Kept clean structure intact
       backgroundColor: AppPallete.whiteColor,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _tasksFuture,
