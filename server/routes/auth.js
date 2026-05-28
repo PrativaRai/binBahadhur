@@ -151,62 +151,6 @@ authRouter.post("/api/reset-password", async (req, res) => {
         res.status(500).json({ error: e.message });
     }
 });
-//complain
-// // === INLINE AUTH MIDDLEWARE ===
-// const customAuth = (req, res, next) => {
-//     try {
-//         const token = req.header("x-auth-token");
-//         if (!token) {
-//             return res.status(401).json({ msg: "No auth token, access denied." });
-//         }
-
-//         // Verifies using the exact key your signin route uses
-//         const verified = jwt.verify(token, "passwordKey");
-//         if (!verified) {
-//             return res.status(401).json({ msg: "Token verification failed, authorization denied." });
-//         }
-
-//         req.userId = verified.id; // Sets the user ID for Mongoose
-//         next();
-//     } catch (err) {
-//         res.status(500).json({ error: err.message });
-//     }
-// };
-
-// // === SUBMIT EMPLOYEE COMPLAINT ROUTE ===
-// // We use customAuth here so it doesn't look for an external file!
-// authRouter.post("/api/user/report-employee", customAuth, async (req, res) => {
-//     try {
-//         const { employeePhone, description, employeeName } = req.body;
-
-//         if (!description || !employeePhone || !employeeName) {
-//             return res.status(400).json({ 
-//                 msg: "Please provide employee name, phone number, and a description." 
-//             });
-//         }
-
-//         // To make sure Complain model is defined, let's pull it directly if needed
-//         const Complain = require("../models/complain"); 
-
-//         let complain = new Complain({
-//             phoneNumber: employeePhone,
-//             description: description,
-//             employee: employeeName,
-//             userId: req.userId, 
-//         });
-
-//         await complain.save();
-
-//         res.json({
-//             success: true,
-//             msg: "Complaint registered and forwarded to Admin successfully",
-//             complain,
-//         });
-//     } catch (e) {
-//         res.status(500).json({ error: e.message });
-//     }
-// });
-
 
 authRouter.post("/api/user/report-employee", auth, async (req, res) => {
   try {
