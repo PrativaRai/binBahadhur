@@ -17,7 +17,6 @@ class _AreaPageState extends State<AreaPage> {
   String? selectedArea;
   int currentIndex = 0;
 
-
   final Map<String, List<String>> areaData = {
     'Dharan': ['Bhanu Chowk', 'Bijaypur'],
     'Biratnagar': ['Traffic Chowk', 'Mahendra Chowk'],
@@ -43,28 +42,25 @@ class _AreaPageState extends State<AreaPage> {
       ),
       backgroundColor: Colors.white,
       bottomNavigationBar: BottomNavBar(
-         currentIndex: currentIndex,
-         onTap: (index) {
-         setState(() {
-        currentIndex = index;
-    });
-    if( index == 0){
-      Navigator.pushAndRemoveUntil(
-      context, MaterialPageRoute(builder: (context)=> const HomePage(),
+        currentIndex: currentIndex,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+          if (index == 0) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+              (route) => false,
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            );
+          }
+        },
       ),
-      (route)=> false,
-      );
-      
-    }
-    else if (index == 3){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context)=> const UserProfilePage(),
-        ),
-        );
-    }
-  },
-),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -98,7 +94,7 @@ class _AreaPageState extends State<AreaPage> {
               ),
             ),
             SizedBox(
-              width : double.infinity,
+              width: double.infinity,
               child: CustomBigButton(
                 text: "Continue",
                 onPressed: () {
