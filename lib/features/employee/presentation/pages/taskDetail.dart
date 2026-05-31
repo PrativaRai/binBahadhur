@@ -78,7 +78,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     }
   }
 
-  //LOGIC: ACCEPT TASK
+  // LOGIC: ACCEPT TASK
   Future<void> _handleAcceptAction(String token) async {
     setState(() => _isLoading = true);
     try {
@@ -88,7 +88,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text("Task accepted!"),
-              backgroundColor: AppPallete.whiteColor,
+              backgroundColor: AppPallete.backgroundColor,
             ),
           );
           Navigator.pop(context, true);
@@ -119,7 +119,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
       existingPhone = widget.task['userId']['phone'];
     }
 
-    // Capture the image URL safely from your backend schema payload
     final String? imageUrl = widget.task['imageUrl'];
 
     return Scaffold(
@@ -132,7 +131,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             _buildHeader(),
             const SizedBox(height: 16),
 
-            // --- NEW: Task Image Container ---
             if (imageUrl != null && imageUrl.isNotEmpty) ...[
               _buildImageCard(imageUrl),
               const SizedBox(height: 16),
@@ -181,7 +179,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             const SizedBox(height: 30),
 
             // BOTTOM ACTION BUTTONS
-            if (!widget.isReadOnly)
+            if (!widget.isReadOnly) // 💡 Feed Screen -> Shows only ACCEPT
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -206,7 +204,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                         ),
                 ),
               )
-            else
+            else // 💡 MyTasksScreen -> Shows START & REPORT
               Row(
                 children: [
                   Expanded(
@@ -294,7 +292,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
     );
   }
 
-  // --- NEW: Helper widget to cleanly display your image ---
   Widget _buildImageCard(String url) {
     return Container(
       width: double.infinity,
@@ -305,9 +302,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         border: Border.all(color: AppPallete.blackColor),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(
-          11,
-        ), // 1px less than container to sit nicely
+        borderRadius: BorderRadius.circular(11),
         child: Image.network(
           url,
           fit: BoxFit.cover,

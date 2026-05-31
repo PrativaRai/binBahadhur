@@ -172,10 +172,15 @@ class _TaskscreenState extends State<Taskscreen> {
                               MaterialPageRoute(
                                 builder: (_) => TaskDetailScreen(
                                   task: task,
-                                  isReadOnly: true,
+                                  isReadOnly:
+                                      false, // 💡 FIX: Set to false so "ACCEPT" button shows
                                 ),
                               ),
-                            );
+                            ).then((value) {
+                              if (value == true) {
+                                loadTasksFromServer(); // Refresh list if accepted
+                              }
+                            });
                           },
                         ),
                       );
@@ -267,7 +272,6 @@ class _TaskscreenState extends State<Taskscreen> {
       onSelected: onChanged,
       color: AppPallete.backgroundColor,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      // 💡 Added offset positioning rule to prevent dropdown overlay over filter buttons
       offset: const Offset(0, 45),
       itemBuilder: (context) => options.map((opt) {
         bool isChecked = currentValue == opt;
@@ -306,7 +310,6 @@ class _TaskscreenState extends State<Taskscreen> {
               ? AppPallete.backgroundColor.withOpacity(0.12)
               : AppPallete.whiteColor,
           borderRadius: BorderRadius.circular(20),
-          // 💡 Updated to thick green outline borders for clean contrast balance layouts
           border: Border.all(color: AppPallete.backgroundColor, width: 2.0),
         ),
         child: Row(

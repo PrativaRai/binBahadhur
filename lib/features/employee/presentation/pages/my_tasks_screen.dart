@@ -21,7 +21,6 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
   void _loadTasks() {
     final token = Provider.of<UserProvider>(context, listen: false).user.token;
     setState(() {
-      // FIX: Changed from fetchAvailableTasks to fetchMyTasks
       _tasksFuture = _service.fetchMyTasks(token);
     });
   }
@@ -37,9 +36,7 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CommonAppBar(
-        title: "My Assigned Jobs",
-      ), // Kept clean structure intact
+      appBar: const CommonAppBar(title: "My Assigned Jobs"),
       backgroundColor: AppPallete.whiteColor,
       body: FutureBuilder<Map<String, dynamic>>(
         future: _tasksFuture,
@@ -102,10 +99,14 @@ class _MyTasksScreenState extends State<MyTasksScreen> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TaskDetailScreen(task: task),
+                        builder: (context) => TaskDetailScreen(
+                          task: task,
+                          isReadOnly:
+                              true, // 💡 FIX: Set to true so START/REPORT buttons show
+                        ),
                       ),
                     );
-                    _loadTasks();
+                    _loadTasks(); // Automatically refetches if anything changes upon returning
                   },
                 ),
               );
