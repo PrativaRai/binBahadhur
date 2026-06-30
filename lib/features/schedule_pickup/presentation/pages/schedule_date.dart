@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/widgets/custom_big_button.dart';
 import 'package:binbahadhur/core/widgets/bottom_nav_bar.dart';
 import 'package:binbahadhur/features/schedule_pickup/presentation/pages/schedule_page.dart';
+import 'package:binbahadhur/features/user/presentation/pages/user_complain.dart';
+import 'package:binbahadhur/features/levels/presentation/current_level.dart';
+import 'package:binbahadhur/features/user/presentation/pages/userNotificationScreen.dart';
 // import 'package:binbahadhur/features/schedule_pickup/data/schedule_service.dart';
 
 class ScheduleDatePage extends StatefulWidget {
@@ -107,27 +110,46 @@ class _ScheduleDatePageState extends State<ScheduleDatePage> {
 
       backgroundColor: Colors.white,
 
-      // bottom navigation bar
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-          if (index == 0) {
+     bottomNavigationBar: BottomNavBar(
+  currentIndex: currentIndex,
+  onTap: (index) {
+    setState(() {
+      currentIndex = index;
+    });
+
+    if (index == 0) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(
-          builder: (context) => const HomePage(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomePage()),
         (route) => false,
       );
-    } else if (index == 3) {
+    }
+
+    if (index == 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const UserProfilePage(),
-        ),
+        MaterialPageRoute(builder: (context) => const UserComplain()),
+      );
+    }
+
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const CurrentLevelPage()),
+      );
+    }
+
+    if (index == 3) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UserNotificationScreen()),
+      );
+    }
+
+    if (index == 4) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UserProfilePage()),
       );
     }
   },

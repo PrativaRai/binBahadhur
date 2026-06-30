@@ -32,8 +32,24 @@ class _SPSaveDetailsPageState extends State<SPSaveDetailsPage> {
     "paper": 12,
     "plastic": 25,
   };
+  final Map<String, List<String>> wasteDescriptions = {
+    "plastic": [
+      "Plastic Bottle",
+      "Plastic Container",
+      "Plastic Bag",
+      "Plastic Packaging",
+      "Other",
+    ],
+
+    "paper": ["Newspaper", "Cardboard", "Office Paper", "Magazine", "Other"],
+
+    "glass": ["Glass Bottle", "Glass Jar", "Broken Glass", "Other"],
+
+    "metal": ["Aluminum Can", "Steel Can", "Metal Scrap", "Other"],
+  };
 
   bool isLoading = false;
+  String? selectedDescription;
 
   late double pricePerKgValue;
 
@@ -50,11 +66,25 @@ class _SPSaveDetailsPageState extends State<SPSaveDetailsPage> {
   }
 
   Future<void> submit() async {
-    if (controller.text.trim().isEmpty) {
+    String finalDescription = "";
+
+    if (selectedDescription == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Description cannot be empty")),
+        const SnackBar(content: Text("Please select a description")),
       );
       return;
+    }
+
+    if (selectedDescription == "Other") {
+      if (controller.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Description cannot be empty")),
+        );
+        return;
+      }
+      finalDescription = controller.text.trim();
+    } else {
+      finalDescription = selectedDescription!;
     }
 
     setState(() => isLoading = true);
@@ -65,7 +95,7 @@ class _SPSaveDetailsPageState extends State<SPSaveDetailsPage> {
       context: context,
       scheduleId: widget.scheduleId,
       wasteType: widget.prediction,
-      description: controller.text,
+      description: finalDescription,
       pricePerKg: pricePerKgValue,
       imageFile: widget.imageFile,
     );
@@ -81,7 +111,7 @@ class _SPSaveDetailsPageState extends State<SPSaveDetailsPage> {
           builder: (_) => SPConfirmationPage(
             scheduleId: widget.scheduleId,
             wasteType: widget.prediction,
-            description: controller.text,
+            description: finalDescription,
             pricePerKg: pricePerKgValue,
           ),
         ),
@@ -162,17 +192,57 @@ class _SPSaveDetailsPageState extends State<SPSaveDetailsPage> {
 
                   const SizedBox(height: 8),
 
-                  TextField(
-                    style: const TextStyle(color: AppPallete.blackColor),
-                    controller: controller,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: "Write description...",
-                      hintStyle: TextStyle(color: AppPallete.blackColor),
-                      border: OutlineInputBorder(),
+                  DropdownButtonFormField<String>(
+                    value: selectedDescription,
+                    dropdownColor: Colors.white,
+                    style: const TextStyle(
+                      color: AppPallete.blackColor, // Green text
+                      fontSize: 16,
                     ),
+                    decoration: const InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(),
+                      labelText: "Select Description",
+                      labelStyle: TextStyle(color: AppPallete.blackColor),
+                    ),
+                    iconEnabledColor: AppPallete.blackColor, // Green icon
+                    items:
+                        wasteDescriptions[widget.prediction]
+                            ?.map(
+                              (description) => DropdownMenuItem<String>(
+                                value: description,
+                                child: Text(
+                                  description,
+                                  style: const TextStyle(
+                                    color: AppPallete.blackColor, // Green text
+                                  ),
+                                ),
+                              ),
+                            )
+                            .toList() ??
+                        [],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDescription = value;
+                      });
+                    },
                   ),
 
+                  if (selectedDescription == "Other") ...[
+                    const SizedBox(height: 16),
+
+                    TextField(
+                      style: const TextStyle(color: AppPallete.blackColor),
+                      controller: controller,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        hintText: "Write description...",
+                        hintStyle: TextStyle(color: AppPallete.blackColor),
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
 
                   SizedBox(

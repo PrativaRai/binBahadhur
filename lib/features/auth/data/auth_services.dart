@@ -304,10 +304,10 @@ class AuthServices {
         response: res,
         context: context,
         onSuccess: () {
-          data = jsonDecode(res.body);
-        },
+          final decoded = jsonDecode(res.body);
+          data = decoded['profile'] ?? decoded;
+       },
       );
-
       return data;
     } catch (e) {
       if (context.mounted) showSnackBar(context, "Profile Error: $e");

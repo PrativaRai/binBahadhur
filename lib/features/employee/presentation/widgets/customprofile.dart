@@ -8,6 +8,7 @@ class CustomProfile extends StatelessWidget {
   final String? imageUrl;
   final Map<String, int>? stats;
   final List<Widget> actionButtons;
+  final VoidCallback? onCameraTap;
 
   const CustomProfile({
     super.key,
@@ -17,6 +18,7 @@ class CustomProfile extends StatelessWidget {
     this.imageUrl,
     this.stats,
     required this.actionButtons,
+    this.onCameraTap,
   });
 
   @override
@@ -39,12 +41,14 @@ class CustomProfile extends StatelessWidget {
                     ? const Icon(Icons.person, size: 60, color: Colors.blue)
                     : null,
               ),
-              if (imageUrl == null || imageUrl!.isEmpty)
-                const CircleAvatar(
+              GestureDetector(
+                onTap: onCameraTap,
+                child: const CircleAvatar(
                   radius: 18,
                   backgroundColor: Colors.blue,
                   child: Icon(Icons.camera_alt, size: 18, color: Colors.white),
                 ),
+              ),
             ],
           ),
           const SizedBox(height: 15),

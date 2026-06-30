@@ -26,6 +26,7 @@ userProfileRouter.get("/api/user-profile/:id", auth, async (req, res) => {
       name: user.name,
       phone: user.phone,
       role: user.type,
+      profilePic: user.profilePic || "",
       // IMPORTANT: always send numbers safely
       tasksDone: tasksDone || 0,
       tasksIncomplete: tasksIncomplete || 0,

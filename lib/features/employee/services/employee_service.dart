@@ -34,10 +34,19 @@ class EmployeeService {
   }
 
   // 1. Fetch available tasks
-  Future<Map<String, dynamic>> fetchAvailableTasks(String token) async {
+  // 1. Fetch available tasks with filters applied
+  Future<Map<String, dynamic>> fetchAvailableTasks({
+    required String token,
+    String duration = "All",
+    String city = "All",
+    String area = "All",
+  }) async {
     try {
+      // Build the query string parameters dynamically
+      String queryParams = "?duration=$duration&city=$city&area=$area";
+
       final response = await http.get(
-        Uri.parse("$baseUrl/api/worker/available-tasks"),
+        Uri.parse("$baseUrl/api/worker/available-tasks$queryParams"),
         headers: {'Content-Type': 'application/json', 'x-auth-token': token},
       );
       return _handleResponse(response);

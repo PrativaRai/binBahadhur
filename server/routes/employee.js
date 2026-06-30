@@ -15,7 +15,28 @@ employeeRouter.get(
   employeeMiddleware,
   async (req, res) => {
     try {
-      const tasks = await Schedule.find({ status: "pending" })
+      const { duration, city, area } = req.query;
+      
+      // Default filter: Only show tasks that are still open
+      let query = { status: "pending" };
+
+      // Chip 1: Duration -> scheduleType ("Weekly", "Monthly", "Custom")
+      if (duration && duration !== "All") {
+        // Capitalizes the first letter (e.g., "weekly" -> "Weekly") to match your Enum
+        query.scheduleType = duration.charAt(0).toUpperCase() + duration.slice(1);
+      }
+
+      // Chip 2: City -> area (e.g., "Kathmandu", "Lalitpur")
+      if (city && city !== "All") {
+        query.area = city;
+      }
+
+      // Chip 3: Area -> subArea (e.g., "Baneshwor", "Pulchowk")
+      if (area && area !== "All") {
+        query.subArea = area;
+      }
+
+      const tasks = await Schedule.find(query)
         .populate("userId", "name")
         .sort({ createdAt: -1 });
 
@@ -128,7 +149,7 @@ employeeRouter.post(
     try {
       const { phoneNumber, description, employee } = req.body;
 
-      // FIXED: Search for the phone number AND ensure the account type is strictly 'user'
+     
       const targetCustomer = await User.findOne({ 
         phone: phoneNumber, 
         type: "user" 
@@ -222,7 +243,7 @@ employeeRouter.post(
       // Update task details
       const weight = Number(weightCollected) || 0;
       task.status = "completed";
-      task.weightCollected = weightCollected; // Ensure these fields exist in your Schedule model
+      task.weightCollected = weightCollected; 
       task.moneyPaid = moneyPaid;
       task.completedAt = Date.now();
 

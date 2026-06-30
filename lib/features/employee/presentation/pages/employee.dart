@@ -19,9 +19,10 @@ class _EmployeePageState extends State<EmployeePage> {
   int currentIndex = 0;
 
   final List<Widget> pages = [
-    const MyTasksScreen(),
-    const Complain(),
     const Taskscreen(),
+    const Complain(),
+
+    const MyTasksScreen(),
     const ProfileScreen(),
   ];
 
