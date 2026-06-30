@@ -3,6 +3,7 @@ import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/customprofile.dart';
+import 'package:binbahadhur/features/user/services/profile_service.dart';
 
 class AdminProfilePage extends StatefulWidget {
   const AdminProfilePage({super.key});
@@ -13,6 +14,22 @@ class AdminProfilePage extends StatefulWidget {
 
 class _AdminProfilePageState extends State<AdminProfilePage> {
   final AuthServices authServices = AuthServices();
+  final ProfileService profileService = ProfileService();
+
+  Future<void> _pickAndUploadImage() async {
+  final imageFile = await profileService.pickImage();
+  if (imageFile == null) return;
+
+  final imageUrl = await profileService.uploadProfilePic(
+    context: context,
+    imageFile: imageFile,
+  );
+
+  if (imageUrl != null) {
+    setState(() {});
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +54,7 @@ class _AdminProfilePageState extends State<AdminProfilePage> {
             phone: data['phone'] ?? 'N/A',
             role: data['role'] ?? 'admin',
             imageUrl: data['profilePic'],
+            onCameraTap: _pickAndUploadImage,
 
             actionButtons: [
               ElevatedButton(

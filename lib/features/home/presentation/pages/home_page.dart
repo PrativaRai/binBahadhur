@@ -25,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int incomplete = 0;
+  String? profilePicUrl;
   bool isLoading = true;
   int currentIndex = 0;
 
@@ -68,6 +69,7 @@ class _HomePageState extends State<HomePage> {
 
         setState(() {
           incomplete = data['tasksIncomplete'] ?? 0;
+          profilePicUrl = data['profilePic'];
           isLoading = false;
         });
       }
@@ -198,12 +200,23 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
+                            padding: profilePicUrl != null && profilePicUrl!.isNotEmpty
+                             ? EdgeInsets.zero
+                             : const EdgeInsets.all(12),
+                            decoration: const BoxDecoration(
+                             shape: BoxShape.circle,
                             color: Colors.white,
-                          ),
-                          child: Image.asset(
+                           ),
+                         child: profilePicUrl != null && profilePicUrl!.isNotEmpty
+                              ? ClipOval(
+                              child: Image.network(
+                              profilePicUrl!,
+                              height: 60,
+                              width: 60,
+                             fit: BoxFit.cover,
+                            ),
+                            )
+                            : Image.asset(
                             getLevelImage(user.points),
                             height: 60,
                             width: 60,

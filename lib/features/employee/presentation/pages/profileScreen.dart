@@ -2,6 +2,7 @@ import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/customprofile.dart';
+import 'package:binbahadhur/features/user/services/profile_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -12,6 +13,21 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final AuthServices authServices = AuthServices();
+  final ProfileService profileService = ProfileService();
+
+  Future<void> _pickAndUploadImage() async {
+  final imageFile = await profileService.pickImage();
+  if (imageFile == null) return;
+
+  final imageUrl = await profileService.uploadProfilePic(
+    context: context,
+    imageFile: imageFile,
+  );
+
+  if (imageUrl != null) {
+    setState(() {});
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +82,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             name: snapshot.data!['name'] ?? 'Unknown',
             phone: snapshot.data!['phone'] ?? 'N/A',
             role: userRole,
+            imageUrl: snapshot.data!['profilePic'],
+            onCameraTap: _pickAndUploadImage,
             stats: isEmployee
                 ? {
                     "Taken": snapshot.data!['tasksTaken'] ?? 0,

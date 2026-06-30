@@ -188,4 +188,27 @@ authRouter.post("/api/user/report-employee", auth, async (req, res) => {
     res.status(500).json({ success: false, error: e.message });
   }
 });
+// Upload Profile Picture
+const { upload, uploadToCloudinary } = require("../middleware/upload");
+
+authRouter.put("/api/upload-profile-pic", auth, upload.single("image"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ msg: "No image uploaded" });
+        }
+
+        const cloudResult = await uploadToCloudinary(req.file.buffer);
+        const imageUrl = cloudResult.secure_url;
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            { profilePic: imageUrl },
+            { new: true }
+        );
+
+        res.json({ success: true, profilePic: imageUrl, user: updatedUser });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 module.exports = authRouter;
