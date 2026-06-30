@@ -23,7 +23,19 @@ class RRSaveDetailsPage extends StatefulWidget {
 
 class _RRSaveDetailsPageState extends State<RRSaveDetailsPage> {
   final TextEditingController controller = TextEditingController();
+  final List<String> reportDescriptions = [
+    "Overflowing Dustbin",
+    "Illegal Waste Dumping",
+    "Garbage Scattered on Road",
+    "Uncollected Household Waste",
+    "Blocked Drain with Waste",
+    "Construction Waste",
+    "Dead Animal",
+    "Hazardous Waste",
+    "Other (Specify)",
+  ];
   bool isLoading = false;
+  String? selectedDescription;
 
   @override
   void dispose() {
@@ -32,21 +44,36 @@ class _RRSaveDetailsPageState extends State<RRSaveDetailsPage> {
   }
 
   Future<void> submitReport() async {
-    if (controller.text.trim().isEmpty) {
+    String finalDescription = "";
+
+    if (selectedDescription == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Description cannot be empty")),
+        const SnackBar(content: Text("Please select a description")),
       );
       return;
     }
 
-    FocusScope.of(context).unfocus(); // fixes yellow flicker
+    if (selectedDescription == "Other (Specify)") {
+      if (controller.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Description cannot be empty")),
+        );
+        return;
+      }
+
+      finalDescription = controller.text.trim();
+    } else {
+      finalDescription = selectedDescription!;
+    }
+
+    FocusScope.of(context).unfocus();
 
     setState(() => isLoading = true);
 
     final updatedReport = await ReportService().updateReport(
       context: context,
       reportId: widget.reportId,
-      description: controller.text,
+      description: finalDescription,
       imageFile: widget.imageFile,
     );
 
@@ -110,16 +137,60 @@ class _RRSaveDetailsPageState extends State<RRSaveDetailsPage> {
 
                 const SizedBox(height: 8),
 
-                TextField(
-                  controller: controller,
-                  maxLines: 3,
+                DropdownButtonFormField<String>(
+                  value: selectedDescription,
+                  dropdownColor: Colors.white,
                   style: const TextStyle(color: AppPallete.blackColor),
                   decoration: const InputDecoration(
-                    hintText: "Write description...",
-                    border: OutlineInputBorder(),
-                    hintStyle: TextStyle(color: AppPallete.greyColor),
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: "Issue Type",
+                    labelStyle: TextStyle(color: AppPallete.blackColor),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: AppPallete.blackColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppPallete.blackColor,
+                        width: 2,
+                      ),
+                    ),
                   ),
+                  iconEnabledColor: AppPallete.blackColor,
+                  hint: const Text(
+                    "Select Issue Type",
+                    style: TextStyle(color: AppPallete.blackColor),
+                  ),
+                  items: reportDescriptions.map((description) {
+                    return DropdownMenuItem<String>(
+                      value: description,
+                      child: Text(
+                        description,
+                        style: const TextStyle(color: AppPallete.blackColor),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedDescription = value;
+                    });
+                  },
                 ),
+
+                if (selectedDescription == "Other (Specify)") ...[
+                  const SizedBox(height: 16),
+
+                  TextField(
+                    controller: controller,
+                    maxLines: 3,
+                    style: const TextStyle(color: AppPallete.blackColor),
+                    decoration: const InputDecoration(
+                      hintText: "Write description...",
+                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(color: AppPallete.greyColor),
+                    ),
+                  ),
+                ],
 
                 const SizedBox(height: 20),
 
