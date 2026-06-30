@@ -1,11 +1,8 @@
-import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
 import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_sub_area_page.dart';
-import 'package:binbahadhur/features/user/presentation/pages/user_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:binbahadhur/core/widgets/custom_big_button.dart';
 import 'package:binbahadhur/core/widgets/area_list_tile.dart';
-import 'package:binbahadhur/core/widgets/bottom_nav_bar.dart';
-// import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_sub_area_page.dart';
+import 'package:binbahadhur/core/widgets/user_bottom_nav.dart';
 
 class RRAreaPage extends StatefulWidget {
   const RRAreaPage({super.key});
@@ -23,6 +20,7 @@ class _RRAreaPageState extends State<RRAreaPage> {
     'Biratnagar': ['Traffic Chowk', 'Mahendra Chowk'],
     'Itahari': ['Bus Park', 'Chatara Road'],
   };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,24 +39,10 @@ class _RRAreaPageState extends State<RRAreaPage> {
         elevation: 0,
       ),
       backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavBar(
+      bottomNavigationBar: UserBottomNav(
         currentIndex: currentIndex,
-        onTap: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-          if (index == 0) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage()),
-              (route) => false,
-            );
-          } else if (index == 3) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserProfilePage()),
-            );
-          }
+        onIndexChanged: (index) {
+          setState(() => currentIndex = index);
         },
       ),
 

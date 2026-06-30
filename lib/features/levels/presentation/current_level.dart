@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'package:binbahadhur/core/widgets/custom_app_bar.dart';
 import 'package:binbahadhur/core/widgets/custom_big_button.dart';
 import 'package:binbahadhur/features/levels/presentation/levels.dart';
 import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
+import 'package:binbahadhur/core/widgets/user_bottom_nav.dart';
 
 class CurrentLevelPage extends StatefulWidget {
   const CurrentLevelPage({super.key});
@@ -18,6 +18,7 @@ class CurrentLevelPage extends StatefulWidget {
 class _CurrentLevelPageState extends State<CurrentLevelPage> {
   int points = 0;
   bool isLoading = true;
+  int currentIndex = 2; // level tab
 
   @override
   void initState() {
@@ -62,6 +63,13 @@ class _CurrentLevelPageState extends State<CurrentLevelPage> {
 
     return Scaffold(
       appBar: const CustomAppBar(title: "Levels"),
+
+      bottomNavigationBar: UserBottomNav(
+        currentIndex: currentIndex,
+        onIndexChanged: (index) {
+          setState(() => currentIndex = index);
+        },
+      ),
 
       body: Container(
         color: Colors.white,
@@ -196,7 +204,6 @@ class _CurrentLevelPageState extends State<CurrentLevelPage> {
                       BlendMode.multiply,
                     )
                   : const ColorFilter.matrix([
-                      //grey pareko image
                       0.2126,
                       0.7152,
                       0.0722,

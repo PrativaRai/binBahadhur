@@ -3,6 +3,7 @@ import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/auth/data/auth_services.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/customprofile.dart';
 import 'package:binbahadhur/features/user/services/profile_service.dart';
+import 'package:binbahadhur/core/widgets/user_bottom_nav.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -13,22 +14,22 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   final AuthServices authServices = AuthServices();
-
   final ProfileService profileService = ProfileService();
+  int currentIndex = 4; // profile tab
 
   Future<void> _pickAndUploadImage() async {
-  final imageFile = await profileService.pickImage();
-  if (imageFile == null) return;
+    final imageFile = await profileService.pickImage();
+    if (imageFile == null) return;
 
-  final imageUrl = await profileService.uploadProfilePic(
-    context: context,
-    imageFile: imageFile,
-  );
+    final imageUrl = await profileService.uploadProfilePic(
+      context: context,
+      imageFile: imageFile,
+    );
 
-  if (imageUrl != null) {
-    setState(() {});
+    if (imageUrl != null) {
+      setState(() {});
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -45,6 +46,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black,
+      ),
+
+      bottomNavigationBar: UserBottomNav(
+        currentIndex: currentIndex,
+        onIndexChanged: (index) {
+          setState(() => currentIndex = index);
+        },
       ),
 
       // body waits for data from server

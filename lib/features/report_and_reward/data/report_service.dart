@@ -7,10 +7,6 @@ import 'package:binbahadhur/features/auth/presentation/providers/user_provider.d
 import 'package:binbahadhur/core/constants/global_variable.dart';
 
 class ReportService {
-  final String uri =
-      'http://192.168.18.124:3000'; //yo prativa le comment gareko hai emmulator ko lagi
-  //final String uri = 'http://10.0.2.2:3000';
-
   // Create report and return reportId
   Future<String?> createReport({
     required BuildContext context,

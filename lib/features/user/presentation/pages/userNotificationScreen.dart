@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:binbahadhur/core/widgets/user_bottom_nav.dart';
 
 class UserNotificationScreen extends StatefulWidget {
   static const String routeName = '/user-notifications';
@@ -20,6 +21,7 @@ class UserNotificationScreen extends StatefulWidget {
 class _UserNotificationScreenState extends State<UserNotificationScreen> {
   Future<Map<String, dynamic>>? _myRequestsFuture;
   bool _hasFetched = false;
+  int currentIndex = 3; // notification tab
 
   final Map<String, Timer> _pendingDeletions = {};
 
@@ -86,6 +88,12 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
     return Scaffold(
       appBar: CommonAppBar(title: "My Request Updates"),
       backgroundColor: AppPallete.whiteColor,
+      bottomNavigationBar: UserBottomNav(
+        currentIndex: currentIndex,
+        onIndexChanged: (index) {
+          setState(() => currentIndex = index);
+        },
+      ),
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
         color: AppPallete.blackColor,
@@ -284,10 +292,8 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
                                       ),
                                     ),
                                     onPressed: () {
-                                      // FIXED: Extract points mapping directly from 'weightCollected' field
                                       int calculatedPoints = 0;
                                       if (request['weightCollected'] != null) {
-                                        // tryParse as double first to elegantly handle string-decimals like "25.5"
                                         final double weight =
                                             double.tryParse(
                                               request['weightCollected']
@@ -297,7 +303,6 @@ class _UserNotificationScreenState extends State<UserNotificationScreen> {
                                         calculatedPoints = weight.round();
                                       }
 
-                                      // Fallback logic check if value evaluates to zero
                                       if (calculatedPoints == 0) {
                                         calculatedPoints = 10;
                                       }

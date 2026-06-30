@@ -4,6 +4,7 @@ import 'package:binbahadhur/core/theme/app_pallete.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/custom_button.dart';
 import 'package:binbahadhur/features/employee/presentation/widgets/custom_textfield.dart';
 import 'package:binbahadhur/features/home/presentation/pages/home_page.dart';
+import 'package:binbahadhur/core/widgets/user_bottom_nav.dart';
 
 import 'package:binbahadhur/features/user/services/user_services.dart';
 
@@ -18,6 +19,8 @@ class UserComplain extends StatefulWidget {
 }
 
 class _UserComplainState extends State<UserComplain> {
+  int currentIndex = 1; // complain tab
+
   // Capture targeted employee details
   final TextEditingController employeePhoneController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -64,6 +67,12 @@ class _UserComplainState extends State<UserComplain> {
     return Scaffold(
       appBar: const CommonAppBar(title: "Report an Employee"),
       backgroundColor: AppPallete.whiteColor,
+      bottomNavigationBar: UserBottomNav(
+        currentIndex: currentIndex,
+        onIndexChanged: (index) {
+          setState(() => currentIndex = index);
+        },
+      ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: SingleChildScrollView(
