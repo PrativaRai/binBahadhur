@@ -1,0 +1,119 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
+import 'package:binbahadhur/core/theme/app_pallete.dart';
+import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
+import 'package:binbahadhur/features/employee/presentation/pages/taskDetail.dart';
+import 'package:binbahadhur/features/employee/services/employee_service.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class MyTasksScreen extends StatefulWidget {
+  const MyTasksScreen({super.key});
+  static const String routeName = '/mytaskscreen';
+
+  @override
+  State<MyTasksScreen> createState() => _MyTasksScreenState();
+}
+
+class _MyTasksScreenState extends State<MyTasksScreen> {
+  final EmployeeService _service = EmployeeService();
+  Future<Map<String, dynamic>>? _tasksFuture;
+
+  void _loadTasks() {
+    final token = Provider.of<UserProvider>(context, listen: false).user.token;
+    setState(() {
+      _tasksFuture = _service.fetchMyTasks(token);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_tasksFuture == null) {
+      _loadTasks();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CommonAppBar(title: "My Assigned Jobs"),
+      backgroundColor: AppPallete.whiteColor,
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _tasksFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(child: Text("No tasks currently available"));
+          }
+
+          final response = snapshot.data!;
+          if (!response['success']) {
+            return Center(child: Text("Error: ${response['error']}"));
+          }
+
+          final tasks = response['tasks'] as List<dynamic>?;
+          if (tasks == null || tasks.isEmpty) {
+            return const Center(child: Text("No tasks currently available"));
+          }
+
+          return ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index] as Map<String, dynamic>;
+
+              return Card(
+                color: AppPallete.whiteColor,
+                elevation: 1,
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFE8F5E9),
+                    child: Icon(Icons.assignment, color: Colors.green),
+                  ),
+                  title: Text(
+                    "${task['area']} - ${task['subArea']}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppPallete.blackColor,
+                    ),
+                  ),
+                  subtitle: Text(
+                    "Schedule: ${task['scheduleType']}",
+                    style: const TextStyle(color: AppPallete.blackColor),
+                  ),
+                  trailing: const Icon(
+                    Icons.chevron_right,
+                    color: AppPallete.backgroundColor,
+                  ),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TaskDetailScreen(
+                          task: task,
+                          isReadOnly:
+                              true, // 💡 FIX: Set to true so START/REPORT buttons show
+                        ),
+                      ),
+                    );
+                    _loadTasks(); // Automatically refetches if anything changes upon returning
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}

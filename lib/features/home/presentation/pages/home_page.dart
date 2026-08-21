@@ -1,0 +1,320 @@
+import 'package:binbahadhur/core/constants/common_appbar.dart';
+import 'package:binbahadhur/features/user/presentation/pages/userNotificationScreen.dart';
+import 'package:binbahadhur/features/user/presentation/pages/user_complain.dart';
+import 'package:binbahadhur/features/user/presentation/pages/user_profile_page.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:binbahadhur/core/theme/app_pallete.dart';
+import 'package:binbahadhur/features/schedule_pickup/presentation/pages/area_page.dart';
+import 'package:binbahadhur/features/report_and_reward/presentation/pages/rr_area_page.dart';
+import 'package:provider/provider.dart';
+import 'package:binbahadhur/features/auth/presentation/providers/user_provider.dart';
+import 'package:binbahadhur/features/auth/data/auth_services.dart';
+import 'package:binbahadhur/core/widgets/bottom_nav_bar.dart';
+import 'package:binbahadhur/core/widgets/custom_option.dart';
+import 'package:binbahadhur/features/levels/presentation/current_level.dart';
+
+class HomePage extends StatefulWidget {
+  static const String routeName = '/home';
+
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int incomplete = 0;
+  String? profilePicUrl;
+  bool isLoading = true;
+  int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTasks();
+  }
+
+  // Helper Methods moved outside build to optimize memory allocation
+  String getLevel(int points) {
+    if (points >= 100) return "bin";
+    if (points >= 50) return "general";
+    return "rookie";
+  }
+
+  String getLevelImage(int points) {
+    if (points >= 100) return "assets/images/binbahadur.png";
+    if (points >= 50) return "assets/images/general_garbage.png";
+    return "assets/images/fohor_rookie.png";
+  }
+
+  void fetchTasks() async {
+    try {
+      final data = await AuthServices().getUserProfile(context: context);
+
+      if (data == null) {
+        if (mounted) setState(() => isLoading = false);
+        return;
+      }
+
+      if (mounted) {
+        // 1. Extract fresh points from database payload
+        final int updatedPoints = data['points'] ?? 0;
+
+        // 2. Sync directly with Provider to trigger listener updates
+        Provider.of<UserProvider>(
+          context,
+          listen: false,
+        ).updatePoints(updatedPoints);
+
+        setState(() {
+          incomplete = data['tasksIncomplete'] ?? 0;
+          profilePicUrl = data['profilePic'];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Listens to UserProvider changes. When updatePoints() calls notifyListeners(), this rebuilds!
+    final user = Provider.of<UserProvider>(context).user;
+    final String name = user.name ?? "User";
+    final String date = DateFormat('EEEE, d MMM').format(DateTime.now());
+
+    return Scaffold(
+      appBar: const CommonAppBar(title: "Home"),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: currentIndex,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+
+          if (index == 0) {
+            return; // Already home
+          }
+
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserComplain()),
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from complain
+              }
+            });
+          }
+
+          if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CurrentLevelPage()),
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from level page
+              }
+            });
+          }
+
+          if (index == 4) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from profile
+              }
+            });
+          }
+
+          if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UserNotificationScreen(),
+              ),
+            ).then((_) {
+              if (mounted) {
+                setState(() => currentIndex = 0);
+                fetchTasks(); // Fetch fresh points when returning from notifications
+              }
+            });
+          }
+        },
+      ),
+      body: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            color: AppPallete.backgroundColor,
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Hello, $name!",
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            date,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const UserProfilePage(),
+                            ),
+                          ).then((_) {
+                            if (mounted) {
+                              setState(() => currentIndex = 0);
+                              fetchTasks();
+                            }
+                          });
+                        },
+                        child: Container(
+                            padding: profilePicUrl != null && profilePicUrl!.isNotEmpty
+                             ? EdgeInsets.zero
+                             : const EdgeInsets.all(12),
+                            decoration: const BoxDecoration(
+                             shape: BoxShape.circle,
+                            color: Colors.white,
+                           ),
+                         child: profilePicUrl != null && profilePicUrl!.isNotEmpty
+                              ? ClipOval(
+                              child: Image.network(
+                              profilePicUrl!,
+                              height: 60,
+                              width: 60,
+                             fit: BoxFit.cover,
+                            ),
+                            )
+                            : Image.asset(
+                            getLevelImage(user.points),
+                            height: 60,
+                            width: 60,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Services",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppPallete.blackColor,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ServiceCard(
+                        icon: Icons.schedule,
+                        label: "Schedule Pickup",
+                        onTap: () {
+                          if (isLoading) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Loading...")),
+                            );
+                            return;
+                          }
+
+                          if (incomplete > 0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "You already have a pending task!",
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AreaPage(),
+                            ),
+                          ).then((_) {
+                            if (mounted) {
+                              setState(() => currentIndex = 0);
+                              fetchTasks();
+                            }
+                          });
+                        },
+                      ),
+                      ServiceCard(
+                        icon: Icons.card_giftcard,
+                        label: "Report & Reward",
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RRAreaPage(),
+                            ),
+                          ).then((_) {
+                            if (mounted) {
+                              setState(() => currentIndex = 0);
+                              fetchTasks();
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
